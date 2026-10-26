@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Carte des lectures : explications adaptatives</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Literata:opsz,wght@7..72,500;7..72,600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style id="app-style">:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#E9EEED;--surface:#FFFFFF;--surface2:#F4F7F6;--ink:#15232B;--muted:#56666E;--line:#C6D1D0;
+--xai:#0B7A68;--nlp:#4B4FC6;--dlg:#A86A12;--root:#15232B;--sel:#C7316A;--crit:#B3392F;--edge:#9AA9AA;--edgex:#6E7F86;
+color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E161B;--surface:#16222A;--surface2:#1C2A33;--ink:#E4ECEC;--muted:#94A4AB;--line:#2D3C44;
+--xai:#3CC3A9;--nlp:#9295F5;--dlg:#E3A84E;--root:#E4ECEC;--sel:#FF6D9C;--crit:#F07A6E;--edge:#3E5058;--edgex:#7C8E95;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E161B;--surface:#16222A;--surface2:#1C2A33;--ink:#E4ECEC;--muted:#94A4AB;--line:#2D3C44;
+--xai:#3CC3A9;--nlp:#9295F5;--dlg:#E3A84E;--root:#E4ECEC;--sel:#FF6D9C;--crit:#F07A6E;--edge:#3E5058;--edgex:#7C8E95;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;display:flex;flex-direction:column;overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:12px 18px 10px;background:var(--surface);border-bottom:1px solid var(--line)}
+header h1{font-family:Literata,Georgia,serif;font-weight:600;font-size:20px;margin:0;letter-spacing:-.01em}
+#stats{color:var(--muted);font-size:13.5px}
+.grow{flex:1}
+.btn{border:1px solid var(--line);background:var(--surface2);border-radius:8px;padding:7px 12px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.btn.primary:disabled{opacity:.45;cursor:default}
+.btn.on{background:var(--sel);border-color:var(--sel);color:#fff}
+.btn.danger{color:var(--crit);border-color:var(--crit);background:transparent}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
+#toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:9px 18px;background:var(--surface);border-bottom:1px solid var(--line);font-size:14px}
+#q{border:1px solid var(--line);background:var(--surface2);border-radius:8px;padding:6px 10px;min-width:200px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{border:1px solid var(--line);border-radius:999px;padding:4px 11px;cursor:pointer;background:transparent;font-size:13.5px}
+.chip[aria-pressed="true"]{background:var(--surface2);border-color:var(--ink)}
+.chip .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:0}
+.flabel{color:var(--muted);font-size:13px}
+select.small{border:1px solid var(--line);background:var(--surface2);border-radius:8px;padding:5px 8px;font-size:13.5px}
+#linkbar{display:none;align-items:center;gap:10px;padding:8px 18px;background:var(--sel);color:#fff;font-size:14px}
+#linkbar.show{display:flex}
+#linkbar select{background:#fff;color:#222;border:0;border-radius:6px;padding:4px 6px}
+#linkbar button{background:transparent;color:#fff;border:1px solid #fff;border-radius:6px;padding:3px 10px;cursor:pointer}
+#banner{display:none;gap:10px;align-items:center;padding:8px 18px;background:var(--surface2);border-bottom:1px solid var(--line);font-size:14px}
+#banner.show{display:flex}
+main{flex:1;display:flex;min-height:0;position:relative}
+#canvas{flex:1;min-width:0;position:relative}
+svg#graph{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+svg#graph:active{cursor:grabbing}
+.edge line.vis{stroke:var(--edge);stroke-width:1.2}
+.edge line.hit{stroke:transparent;stroke-width:12;cursor:pointer}
+.edge:not(.rel-contient) line.vis{stroke:var(--edgex);stroke-dasharray:5 4;stroke-width:1.3}
+.edge.rel-critique line.vis{stroke:var(--crit)}
+.edge text{font-size:10px;fill:var(--muted);paint-order:stroke;stroke:var(--bg);stroke-width:3px;display:none;pointer-events:none}
+svg.near .edge:not(.rel-contient) text,.edge.is-sel text,.edge.is-hot text{display:block}
+.edge.is-sel line.vis,.edge.is-hot line.vis{stroke:var(--sel);stroke-width:2.2}
+.node{cursor:pointer}
+.node text{fill:var(--ink);paint-order:stroke;stroke:var(--bg);stroke-width:3.5px;stroke-linejoin:round;pointer-events:none;text-anchor:middle}
+.node.k-root text{font-family:Literata,Georgia,serif;font-size:17px;font-weight:600}
+.node.k-domain text{font-family:Literata,Georgia,serif;font-size:16px;font-weight:600}
+.node.k-axis text{font-size:13px;font-weight:700}
+.node.k-paper text{font-size:11.5px}
+svg.far .node.k-paper text{display:none}
+svg.far .node.k-paper.is-sel text,svg.far .node.k-paper.is-hot text,svg.far .node.k-paper.is-match text{display:block}
+.node circle.body{stroke-width:2}
+.node circle.ring{fill:none;stroke-width:1.4}
+.node.verify circle.body{stroke-dasharray:3 2}
+.node.is-sel circle.body{stroke:var(--sel)!important;stroke-width:3.5}
+.node.is-from circle.body{stroke:var(--sel)!important;stroke-width:4}
+.dim{opacity:.13}
+#legend{position:absolute;left:14px;bottom:14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12.5px;color:var(--muted);display:grid;grid-template-columns:auto 1fr;gap:5px 9px;align-items:center;max-width:250px}
+#legend svg{display:block}
+#zoomctl{position:absolute;right:14px;bottom:14px;display:flex;gap:6px}
+#panel{width:380px;max-width:100%;background:var(--surface);border-left:1px solid var(--line);overflow-y:auto;padding:18px 18px 28px}
+#panel h2{font-family:Literata,Georgia,serif;font-size:19px;line-height:1.35;margin:0 0 6px;font-weight:600}
+#panel h3{font-size:13.5px;color:var(--muted);font-weight:700;margin:20px 0 8px}
+#panel p{line-height:1.55;margin:0 0 10px;max-width:62ch}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:11px}
+.field label{font-size:12.5px;color:var(--muted)}
+.field input[type=text],.field input[type=url],.field select,.field textarea{border:1px solid var(--line);background:var(--surface2);border-radius:7px;padding:7px 9px;width:100%}
+.field textarea{min-height:90px;resize:vertical;line-height:1.5}
+.row{display:flex;gap:10px}
+.row>.field{flex:1}
+.checks{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px}
+.checks label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.conn{list-style:none;padding:0;margin:0;font-size:14px}
+.conn li{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--line)}
+.conn li .rel{color:var(--muted);font-size:12.5px;min-width:78px}
+.conn li button.go{flex:1;text-align:left;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.conn li button.x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:16px;padding:0 4px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.tag{display:inline-block;font-size:12px;border-radius:5px;padding:2px 7px;margin:0 5px 5px 0;background:var(--surface2);border:1px solid var(--line)}
+.warn{color:var(--crit)}
+a{color:inherit}
+#toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:9px 16px;border-radius:9px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;z-index:20}
+#toast.show{opacity:1}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);width:min(680px,92vw);padding:18px}
+dialog::backdrop{background:rgba(0,0,0,.35)}
+dialog textarea{width:100%;height:300px;font-family:ui-monospace,Menlo,monospace;font-size:12px;border:1px solid var(--line);border-radius:8px;background:var(--surface2);padding:8px}
+.ro .editonly{display:none!important}
+@media (max-width:820px){main{flex-direction:column}#panel{width:100%;border-left:0;border-top:1px solid var(--line);max-height:46%}#legend{display:none}header h1{font-size:17px}}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body>
+<script type="application/json" id="graph-data">{"version": 1, "savedAt": "2026-10-26T12:00:00Z", "nodes": [{"id": "root", "kind": "root", "domain": "root", "label": "Explications adaptatives en langage naturel", "short": "Explications adaptatives", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "Comprendre ce que l’utilisateur veut savoir, décider quoi expliquer ensuite, adapter fidèlement l’explication au fil du dialogue.", "url": "", "summary": "Programme de recherche : aider un utilisateur à explorer un modèle boîte noire par un dialogue qui évolue. Le système comprend le besoin, calcule les explications pertinentes et adapte leur communication.", "rqNote": "RQ1 : que retenir de l’utilisateur et du dialogue. RQ2 : décider quand clarifier et quelle méthode utiliser. RQ3 : adapter le contenu et la formulation sans affirmations non étayées."}, {"id": "xai", "kind": "domain", "domain": "xai", "label": "XAI", "short": "XAI", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "Méthodes d’explication, besoins humains, évaluation.", "url": "", "summary": "Méthodes pour rendre compréhensibles les décisions des modèles, et études de ce dont les humains ont réellement besoin.", "rqNote": "Fournit le moteur « Investigate » (RQ2) et les critères d’évaluation de la compréhension (RQ3)."}, {"id": "nlp", "kind": "domain", "domain": "nlp", "label": "NLP", "short": "NLP", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "Génération d’explications en langue naturelle et fidélité des LLM.", "url": "", "summary": "Génération et évaluation d’explications en langue naturelle, et fidélité des explications produites par les LLM.", "rqNote": "Couvre l’étape « Communicate » et le risque principal de RQ3 : un texte plausible mais infidèle."}, {"id": "dlg", "kind": "domain", "domain": "dlg", "label": "Dialogues formels", "short": "Dialogues formels", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "Modéliser l’interlocuteur et planifier le dialogue de façon contrôlable.", "url": "", "summary": "Modèles formels du dialogue et de l’argumentation : actes de dialogue, protocoles, représentation quantitative des états de l’interlocuteur.", "rqNote": "Apporte un modèle utilisateur contrôlable et vérifiable (RQ1) et une planification explicite des tours (RQ2)."}, {"id": "x1", "kind": "axis", "domain": "xai", "label": "Fondements et définitions", "short": "Fondements et définitions", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Ce qu’on entend par interprétabilité et explication.", "rqNote": "Sert à définir précisément les termes de vos RQ."}, {"id": "lipton", "kind": "paper", "domain": "xai", "label": "The Mythos of Model Interpretability", "short": "Mythos", "authors": "Z. C. Lipton", "year": "2016", "venue": "ICML WHI (puis ACM Queue 2018)", "status": "a_lire", "pioneer": true, "verify": false, "rq": [], "note": "Montre que « interprétabilité » recouvre des notions différentes.", "url": "", "summary": "Montre que l’interprétabilité recouvre des objectifs différents (confiance, causalité, transférabilité, information, équité) et distingue transparence du modèle et explications post-hoc. Met en garde contre des explications post-hoc séduisantes mais trompeuses.", "rqNote": "Aide à expliciter l’objectif de l’utilisateur derrière une question (RQ1) et fonde la vigilance sur les explications post-hoc générées (RQ3)."}, {"id": "doshi", "kind": "paper", "domain": "xai", "label": "Towards a Rigorous Science of Interpretable Machine Learning", "short": "Rigorous science", "authors": "F. Doshi-Velez, B. Kim", "year": "2017", "venue": "arXiv", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "Taxonomie de l’évaluation : application, humain, fonctionnelle.", "url": "", "summary": "Propose une définition de l’interprétabilité et trois niveaux d’évaluation : ancrée dans l’application (vrais utilisateurs, vraie tâche), ancrée dans l’humain (tâches simplifiées) et fonctionnelle (proxys sans humain).", "rqNote": "Cadre le protocole pour « démontrer que l’utilisateur comprend mieux » : choisir le niveau d’évaluation et l’assumer."}, {"id": "miller", "kind": "paper", "domain": "xai", "label": "Explanation in Artificial Intelligence: Insights from the Social Sciences", "short": "Miller", "authors": "T. Miller", "year": "2019", "venue": "Artificial Intelligence", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ1"], "note": "Explications contrastives, sélectives et sociales. Cité dans votre présentation.", "url": "", "summary": "Synthèse des sciences sociales sur l’explication : les explications sont contrastives (pourquoi P plutôt que Q), sélectives (quelques causes), moins probabilistes que causales, et sociales, donc conversationnelles.", "rqNote": "Donne une théorie pour typer les besoins (questions contrastives, sélection des causes) en RQ1 et justifie le format dialogique de RQ2."}, {"id": "x2", "kind": "axis", "domain": "xai", "label": "Attribution post-hoc", "short": "Attribution post-hoc", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Méthodes qui attribuent à chaque variable une part de la prédiction.", "rqNote": "Opérations de base du module « Investigate » (RQ2)."}, {"id": "lime", "kind": "paper", "domain": "xai", "label": "“Why Should I Trust You?” Explaining the Predictions of Any Classifier", "short": "LIME", "authors": "M. T. Ribeiro, S. Singh, C. Guestrin", "year": "2016", "venue": "KDD", "status": "a_lire", "pioneer": true, "verify": false, "rq": ["RQ2"], "note": "", "url": "", "summary": "Explique une prédiction en ajustant localement un modèle linéaire simple sur des perturbations de l’instance. Agnostique au modèle. Propose aussi SP-LIME pour choisir des exemples représentatifs.", "rqNote": "Opération candidate pour « quels facteurs ? » (RQ2). Instabilité et coût en appels connus, à surveiller pour la fidélité (RQ3)."}, {"id": "shap", "kind": "paper", "domain": "xai", "label": "A Unified Approach to Interpreting Model Predictions", "short": "SHAP", "authors": "S. Lundberg, S.-I. Lee", "year": "2017", "venue": "NeurIPS", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ2"], "note": "", "url": "", "summary": "Unifie plusieurs méthodes d’attribution sous les valeurs de Shapley, avec des garanties axiomatiques (efficience, symétrie, nullité). Propose KernelSHAP, agnostique au modèle.", "rqNote": "Opération de référence (RQ2) ; c’est l’entrée de XAIStories et de TalkToModel, donc le point de comparaison naturel."}, {"id": "ig", "kind": "paper", "domain": "xai", "label": "Axiomatic Attribution for Deep Networks", "short": "Integrated Gradients", "authors": "M. Sundararajan, A. Taly, Q. Yan", "year": "2017", "venue": "ICML", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ2"], "note": "", "url": "", "summary": "Attribution pour modèles différentiables : intègre les gradients le long d’un chemin entre une baseline et l’entrée. Satisfait les axiomes de sensibilité et d’invariance à l’implémentation.", "rqNote": "Pertinent si la boîte noire est un réseau de neurones ou un LLM. SR-NLE l’utilise comme feedback pour rendre les NLE plus fidèles (RQ3)."}, {"id": "anchors", "kind": "paper", "domain": "xai", "label": "Anchors: High-Precision Model-Agnostic Explanations", "short": "Anchors", "authors": "M. T. Ribeiro, S. Singh, C. Guestrin", "year": "2018", "venue": "AAAI", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ2"], "note": "", "url": "", "summary": "Produit des règles « si… alors… » de haute précision qui suffisent localement à fixer la prédiction, avec une mesure de couverture.", "rqNote": "Les règles se traduisent facilement en langue naturelle, ce qui convient aux non-experts (RQ3). Baseline de MaNtLE."}, {"id": "x3", "kind": "axis", "domain": "xai", "label": "Contrefactuels et recours", "short": "Contrefactuels et recours", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Explications par changements minimaux qui modifient la décision.", "rqNote": "Répondent à « que faudrait-il changer ? » et au recours (RQ2, RQ3)."}, {"id": "wachter", "kind": "paper", "domain": "xai", "label": "Counterfactual Explanations without Opening the Black Box", "short": "Wachter", "authors": "S. Wachter, B. Mittelstadt, C. Russell", "year": "2017", "venue": "Harvard Journal of Law & Technology", "status": "a_lire", "pioneer": true, "verify": false, "rq": ["RQ2"], "note": "", "url": "", "summary": "Définit l’explication contrefactuelle comme le plus petit changement de l’entrée qui modifie la décision, sans ouvrir la boîte noire. Argumentation juridique liée au RGPD.", "rqNote": "Répond à « que faudrait-il changer ? » (RQ2) et rejoint l’argument légal de votre slide 5."}, {"id": "dice", "kind": "paper", "domain": "xai", "label": "Explaining ML Classifiers through Diverse Counterfactual Explanations", "short": "DiCE", "authors": "R. K. Mothilal, A. Sharma, C. Tan", "year": "2020", "venue": "FAT* / FAccT", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ2"], "note": "", "url": "", "summary": "Génère plusieurs contrefactuels diversifiés et réalisables, par optimisation avec termes de proximité et de diversité, et contraintes sur les variables modifiables. Bibliothèque disponible.", "rqNote": "Outil prêt à l’emploi. La diversité permet de proposer une autre option quand l’utilisateur rejette une suggestion (RQ2)."}, {"id": "karimi", "kind": "paper", "domain": "xai", "label": "Algorithmic Recourse: from Counterfactual Explanations to Interventions", "short": "Recours algorithmique", "authors": "A.-H. Karimi, B. Schölkopf, I. Valera", "year": "2021", "venue": "FAccT", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ2", "RQ3"], "note": "", "url": "", "summary": "Montre que des contrefactuels qui ignorent la causalité peuvent donner des recommandations inefficaces, et reformule le recours comme des interventions sur un modèle causal.", "rqNote": "Une explication « actionnable » doit respecter les dépendances causales : critère de fidélité du contenu (RQ3)."}, {"id": "naturalxai", "kind": "paper", "domain": "xai", "label": "Natural XAI: Feasible, Actionable, and Causally-Aware Counterfactual Explanations in Natural Language", "short": "Natural XAI", "authors": "", "year": "2025", "venue": "", "status": "lu", "pioneer": false, "verify": true, "rq": ["RQ2", "RQ3"], "note": "Taxonomie d’actionnabilité (FAT), graphe causal (DECI), NLG à base de templates, raffinement itératif avec l’utilisateur.", "url": "", "summary": "Intègre une taxonomie d’actionnabilité des variables (FAT) et la découverte causale (DECI) dans la génération de contrefactuels, présentés en langue naturelle par templates. Un workflow agentique laisse l’utilisateur affiner les contraintes.", "rqNote": "Les contraintes données par l’utilisateur forment un modèle de l’utilisateur (RQ1). Exemple de NLG contrôlée qui limite les affirmations non étayées (RQ3)."}, {"id": "x4", "kind": "axis", "domain": "xai", "label": "Explications par concepts", "short": "Explications par concepts", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Explications en termes de concepts humains plutôt que de variables brutes.", "rqNote": "Utile pour la question « quels concepts comptent ? » de votre slide 6."}, {"id": "tcav", "kind": "paper", "domain": "xai", "label": "Interpretability Beyond Feature Attribution: Testing with Concept Activation Vectors", "short": "TCAV", "authors": "B. Kim et al.", "year": "2018", "venue": "ICML", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ2"], "note": "", "url": "", "summary": "Mesure la sensibilité d’un modèle à un concept humain, défini par des exemples, grâce à des vecteurs d’activation de concept.", "rqNote": "Piste pour « quels concepts comptent ? ». Moins directe pour des données tabulaires."}, {"id": "x5", "kind": "axis", "domain": "xai", "label": "XAI centrée humain et besoins", "short": "XAI centrée humain et besoins", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Études empiriques sur les besoins, l’usage et les effets des explications chez les humains.", "rqNote": "Base pour représenter les besoins (RQ1) et pour l’évaluation."}, {"id": "liao", "kind": "paper", "domain": "xai", "label": "Questioning the AI: Informing Design Practices for Explainable AI User Experiences", "short": "XAI Question Bank", "authors": "Q. V. Liao, D. Gruen, S. Miller", "year": "2020", "venue": "CHI", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ1"], "note": "Typologie des questions des utilisateurs. Base possible pour représenter les besoins explicatifs.", "url": "", "summary": "Entretiens avec des praticiens UX. Propose la XAI Question Bank, qui organise les besoins en catégories de questions (how, why, why not, what if, how to be that, data, performance…) reliées à des méthodes XAI.", "rqNote": "Candidat fort pour représenter les besoins explicatifs (RQ1) et pour la correspondance question → méthode (RQ2)."}, {"id": "kaur", "kind": "paper", "domain": "xai", "label": "Interpreting Interpretability: Understanding Data Scientists’ Use of Interpretability Tools", "short": "Kaur", "authors": "H. Kaur et al.", "year": "2020", "venue": "CHI", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ1"], "note": "", "url": "", "summary": "Étude auprès de data scientists : ils font trop confiance à des outils comme SHAP et les interprètent souvent mal.", "rqNote": "Justifie l’adaptation même pour des experts (votre slide 7) et le besoin de vérifier la compréhension réelle."}, {"id": "alufaisan", "kind": "paper", "domain": "xai", "label": "Does Explainable AI Improve Human Decision-Making?", "short": "Alufaisan", "authors": "Y. Alufaisan et al.", "year": "2021", "venue": "AAAI", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Expériences montrant que fournir des explications n’améliore pas forcément la qualité des décisions humaines par rapport à la prédiction seule.", "rqNote": "Argument pour mesurer la compréhension objective, pas seulement la satisfaction."}, {"id": "bucinca", "kind": "paper", "domain": "xai", "label": "To Trust or to Think: Cognitive Forcing Functions Can Reduce Overreliance on AI", "short": "Cognitive forcing", "authors": "Z. Buçinca, M. B. Malaya, K. Z. Gajos", "year": "2021", "venue": "CSCW", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ1"], "note": "", "url": "", "summary": "Les explications peuvent accroître la sur-confiance. Des « fonctions de forçage cognitif » (faire réfléchir l’humain avant de montrer l’IA) la réduisent, au prix d’une expérience jugée moins agréable.", "rqNote": "Éclaire le compromis préférence/performance. La stratégie d’explication peut inclure des questions posées à l’utilisateur (RQ2)."}, {"id": "prefperf", "kind": "paper", "domain": "xai", "label": "Towards Balancing Preference and Performance through Adaptive Personalized Explainability", "short": "Préférence vs performance", "authors": "", "year": "2024", "venue": "HRI", "status": "lu", "pioneer": false, "verify": true, "rq": ["RQ1", "RQ2"], "note": "Pondération λ entre préférence et performance, adaptée à chaque décision.", "url": "", "summary": "Dans un simulateur de conduite où l’IA se trompe 30 % du temps, compare langue naturelle, cartes d’importance et arbres de décision. Adapte la modalité avec un poids λ entre préférence et performance, prédit à chaque décision.", "rqNote": "Idée transposable : arbitrer dynamiquement entre ce que l’utilisateur préfère et ce qui l’aide vraiment (RQ2)."}, {"id": "x6", "kind": "axis", "domain": "xai", "label": "XAI conversationnelle", "short": "XAI conversationnelle", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Systèmes où l’explication passe par un dialogue en langage naturel.", "rqNote": "Le cœur de votre état de l’art : situer votre contribution par rapport à ces systèmes."}, {"id": "sokol", "kind": "paper", "domain": "xai", "label": "Conversational Explanations of ML Predictions Through Class-contrastive Counterfactual Statements", "short": "Sokol & Flach", "authors": "K. Sokol, P. Flach", "year": "2018", "venue": "IJCAI", "status": "a_lire", "pioneer": true, "verify": false, "rq": ["RQ2"], "note": "", "url": "", "summary": "Démonstrateur d’explications conversationnelles : l’utilisateur pose des questions et reçoit des contrefactuels contrastifs, en précisant ses contraintes.", "rqNote": "Ancêtre direct de votre vision : le dialogue comme interface d’explication (RQ2)."}, {"id": "rohlfing", "kind": "paper", "domain": "xai", "label": "Explanation as a Social Practice: Toward a Conceptual Framework for the Social Design of AI Systems", "short": "Co-construction", "authors": "K. J. Rohlfing et al.", "year": "2021", "venue": "IEEE TCDS", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ1"], "note": "", "url": "", "summary": "Cadre conceptuel où l’explication est une pratique sociale co-construite entre explainer et explainee, avec un niveau micro (le dialogue) et un niveau macro (rôles, modèle du partenaire).", "rqNote": "Fondement du « modèle du partenaire » à maintenir (RQ1). CoCoXplain et l’étude des LLM co-constructifs s’en réclament."}, {"id": "lakkaraju", "kind": "paper", "domain": "xai", "label": "Rethinking Explainability as a Dialogue: A Practitioner’s Perspective", "short": "Explainability as dialogue", "authors": "H. Lakkaraju et al.", "year": "2022", "venue": "arXiv", "status": "lu", "pioneer": false, "verify": false, "rq": ["RQ1"], "note": "", "url": "", "summary": "Entretiens avec des médecins, des professionnels et des décideurs : ils veulent interroger les modèles en langage naturel, comme un collègue. Propose cinq principes pour concevoir des explications interactives.", "rqNote": "Les cinq principes peuvent servir d’exigences de conception et de grille d’évaluation."}, {"id": "ttm", "kind": "paper", "domain": "xai", "label": "Explaining Machine Learning Models with Interactive Natural Language Conversations Using TalkToModel", "short": "TalkToModel", "authors": "D. Slack et al.", "year": "2023", "venue": "Nature Machine Intelligence", "status": "lu", "pioneer": false, "verify": false, "rq": ["RQ2"], "note": "Parsing vers une grammaire exécutable, positionné après l’entraînement.", "url": "", "summary": "Traduit les questions de l’utilisateur en une grammaire exécutable via un LLM fine-tuné, exécute les opérations XAI et répond en langage naturel. Pour classifieurs tabulaires.", "rqNote": "Baseline principale pour « Interpréter → Exécuter → Répondre ». Ne modélise pas l’utilisateur (manque RQ1)."}, {"id": "interrolang", "kind": "paper", "domain": "xai", "label": "InterroLang: Exploring NLP Models and Datasets through Dialogue-based Explanations", "short": "InterroLang", "authors": "N. Feldhus et al.", "year": "2023", "venue": "Findings of EMNLP", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ2"], "note": "", "url": "", "summary": "Transpose l’approche TalkToModel aux modèles de NLP (classification de texte), avec attribution, contrefactuels et rationales, et une étude utilisateur.", "rqNote": "Montre l’extension à un autre type de données : utile pour décider du périmètre."}, {"id": "convxai", "kind": "paper", "domain": "xai", "label": "ConvXAI: Delivering Heterogeneous AI Explanations via Conversations", "short": "ConvXAI", "authors": "H. Shen et al.", "year": "2023", "venue": "CSCW Companion", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ2"], "note": "", "url": "", "summary": "Système conversationnel qui combine plusieurs types d’explications pour l’aide à la rédaction scientifique ; étudie des besoins variés selon les utilisateurs.", "rqNote": "Illustre le choix de la méthode selon la question et l’utilisateur (RQ2)."}, {"id": "llmcheckup", "kind": "paper", "domain": "xai", "label": "LLMCheckup: Conversational Examination of LLMs via Interpretability Tools and Self-Explanations", "short": "LLMCheckup", "authors": "Q. Wang et al.", "year": "2024", "venue": "HCI+NLP Workshop", "status": "lu", "pioneer": false, "verify": false, "rq": ["RQ2"], "note": "", "url": "", "summary": "Un seul LLM interprète la requête, exécute la tâche, produit des self-explanations et appelle des outils d’interprétabilité, sans fine-tuning. Parsing par décodage guidé ou multi-prompt.", "rqNote": "Montre qu’un LLM unique suffit pour interpréter les questions. Non adaptatif."}, {"id": "xaistories", "kind": "paper", "domain": "xai", "label": "Tell Me a Story! Narrative-Driven XAI with Large Language Models", "short": "XAIStories", "authors": "D. Martens et al.", "year": "2025", "venue": "Decision Support Systems", "status": "lu", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Utilise un LLM pour transformer des valeurs SHAP et des contrefactuels en récits. Les études utilisateurs rapportent une meilleure compréhension perçue.", "rqNote": "Modèle de l’étape « Communicate ». Pas de dialogue ni d’adaptation, et la fidélité des récits reste à garantir (RQ3)."}, {"id": "cocoxplain", "kind": "paper", "domain": "xai", "label": "Towards Co-Constructed Explanations: A Multi-Agent Reasoning-Based Conversational System for Adaptive Explanations", "short": "CoCoXplain", "authors": "D. Mindlin et al.", "year": "2025", "venue": "HAI", "status": "lu", "pioneer": false, "verify": false, "rq": ["RQ1", "RQ2"], "note": "Boucle MAPE-K. Explications précalculées : pas de construction dynamique.", "url": "", "summary": "Boucle MAPE-K avec agents LLM : suit l’engagement (ICAP) et les signaux de compréhension, maintient un modèle utilisateur et planifie le tour suivant. Compréhension perçue meilleure, compréhension objective non.", "rqNote": "Référence la plus proche de RQ1. Sa limite (explications précalculées) est votre ouverture pour RQ2."}, {"id": "x7", "kind": "axis", "domain": "xai", "label": "Évaluation et fidélité", "short": "Évaluation et fidélité", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Comment mesurer la fidélité et l’utilité des explications.", "rqNote": "Transversal : la question « comment démontrer que l’utilisateur comprend mieux ? »."}, {"id": "hoffman", "kind": "paper", "domain": "xai", "label": "Metrics for Explainable AI: Challenges and Prospects", "short": "Metrics for XAI", "authors": "R. R. Hoffman et al.", "year": "2018", "venue": "arXiv", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Propose des mesures pour évaluer l’XAI : qualité de l’explication, satisfaction, modèle mental de l’utilisateur, curiosité, confiance, performance de la tâche.", "rqNote": "Boîte à outils pour mesurer le modèle mental de l’utilisateur, au-delà de la satisfaction."}, {"id": "jacovi", "kind": "paper", "domain": "xai", "label": "Towards Faithfully Interpretable NLP Systems", "short": "Jacovi & Goldberg", "authors": "A. Jacovi, Y. Goldberg", "year": "2020", "venue": "ACL", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Clarifie la fidélité : distincte de la plausibilité, graduelle plutôt que binaire. Donne des lignes directrices pour l’évaluer.", "rqNote": "Vocabulaire de base pour formuler RQ3."}, {"id": "hase", "kind": "paper", "domain": "xai", "label": "Evaluating Explainable AI: Which Algorithmic Explanations Help Users Predict Model Behavior?", "short": "Simulatabilité", "authors": "P. Hase, M. Bansal", "year": "2020", "venue": "ACL", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Mesure la simulatabilité (l’utilisateur prédit-il le modèle ?) avant et après des explications LIME, Anchors, prototypes, etc. Peu de méthodes aident nettement.", "rqNote": "Protocole réutilisable pour l’évaluation objective, repris par MaNtLE."}, {"id": "nauta", "kind": "paper", "domain": "xai", "label": "From Anecdotal Evidence to Quantitative Evaluation Methods: A Systematic Review on Evaluating XAI", "short": "Co-12", "authors": "M. Nauta et al.", "year": "2023", "venue": "ACM Computing Surveys", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Revue systématique de l’évaluation XAI. Propose 12 propriétés (Co-12) : exactitude, complétude, cohérence, compacité, contrastivité, etc.", "rqNote": "Grille pour choisir les critères d’évaluation de votre système."}, {"id": "n1", "kind": "axis", "domain": "nlp", "label": "Fondations des modèles", "short": "Fondations des modèles", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Architectures et techniques de base des modèles de langue.", "rqNote": "Contexte technique, utile si vous entraînez un modèle explicatif dédié."}, {"id": "transformer", "kind": "paper", "domain": "nlp", "label": "Attention Is All You Need", "short": "Transformer", "authors": "A. Vaswani et al.", "year": "2017", "venue": "NeurIPS", "status": "a_lire", "pioneer": true, "verify": false, "rq": [], "note": "", "url": "", "summary": "Architecture fondée uniquement sur l’attention, sans récurrence, base de tous les LLM actuels.", "rqNote": "Contexte technique."}, {"id": "t5", "kind": "paper", "domain": "nlp", "label": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer", "short": "T5", "authors": "C. Raffel et al.", "year": "2020", "venue": "JMLR", "status": "lu", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Formule toutes les tâches de NLP en texte → texte avec un préfixe de tâche, et compare systématiquement les choix de pré-entraînement. Introduit le corpus C4.", "rqNote": "Base de MaNtLE. Utile si vous entraînez un petit modèle explicatif."}, {"id": "distill", "kind": "paper", "domain": "nlp", "label": "Distilling the Knowledge in a Neural Network", "short": "Distillation", "authors": "G. Hinton, O. Vinyals, J. Dean", "year": "2015", "venue": "NIPS Deep Learning Workshop", "status": "lu", "pioneer": true, "verify": false, "rq": [], "note": "", "url": "", "summary": "Entraîne un petit modèle (student) à reproduire les probabilités adoucies d’un gros modèle (teacher).", "rqNote": "Piste pour déployer un module explicatif léger."}, {"id": "n2", "kind": "axis", "domain": "nlp", "label": "Explications en langue naturelle (NLE)", "short": "Explications en langue naturelle (NLE)", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Datasets et modèles qui produisent des justifications textuelles.", "rqNote": "Montre les formats d’explication textuelle et leurs limites (RQ3)."}, {"id": "esnli", "kind": "paper", "domain": "nlp", "label": "e-SNLI: Natural Language Inference with Natural Language Explanations", "short": "e-SNLI", "authors": "O.-M. Camburu et al.", "year": "2018", "venue": "NeurIPS", "status": "lu", "pioneer": true, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Ajoute des explications humaines à SNLI et entraîne des modèles « prédire puis expliquer » et « expliquer puis prédire ». Les explications générées restent de qualité moyenne et transfèrent mal.", "rqNote": "Pionnier des NLE supervisées. Montre la difficulté d’obtenir des explications de bonne qualité par simple entraînement."}, {"id": "cose", "kind": "paper", "domain": "nlp", "label": "Explain Yourself! Leveraging Language Models for Commonsense Reasoning", "short": "CoS-E", "authors": "N. F. Rajani et al.", "year": "2019", "venue": "ACL", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Collecte des explications humaines pour CommonsenseQA. Le modèle CAGE génère une explication puis s’en sert pour répondre, ce qui améliore la précision.", "rqNote": "Exemple d’explication utilisée comme raisonnement ; sa fidélité a ensuite été discutée."}, {"id": "makeup", "kind": "paper", "domain": "nlp", "label": "Make Up Your Mind! Adversarial Generation of Inconsistent Natural Language Explanations", "short": "Make Up Your Mind!", "authors": "O.-M. Camburu et al.", "year": "2020", "venue": "ACL", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Attaque adverse montrant que des modèles NLE peuvent produire des explications incohérentes entre elles pour des entrées voisines.", "rqNote": "Test de cohérence à intégrer à la vérification (RQ3)."}, {"id": "teachme", "kind": "paper", "domain": "nlp", "label": "Teach Me to Explain: A Review of Datasets for Explainable NLP", "short": "Teach Me to Explain", "authors": "S. Wiegreffe, A. Marasović", "year": "2021", "venue": "NeurIPS Datasets & Benchmarks", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Revue des datasets d’explications en NLP. Distingue surlignages, explications libres et explications structurées.", "rqNote": "Vocabulaire des formats d’explication, pour choisir le format de sortie."}, {"id": "mariotti", "kind": "paper", "domain": "nlp", "label": "Towards Harnessing Natural Language Generation to Explain Black-box Models", "short": "Mariotti", "authors": "E. Mariotti et al.", "year": "2020", "venue": "NL4XAI Workshop", "status": "lu", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Panorama des approches de génération d’explications textuelles (templates, génération de bout en bout) et des problèmes d’évaluation. Défend le dialogue explicatif.", "rqNote": "Montre la limite des templates et l’absence de métriques consensuelles (RQ3)."}, {"id": "cambria", "kind": "paper", "domain": "nlp", "label": "A Survey on XAI and Natural Language Explanations", "short": "Survey NLE", "authors": "E. Cambria et al.", "year": "2023", "venue": "Information Processing & Management", "status": "lu", "pioneer": false, "verify": false, "rq": ["RQ1", "RQ3"], "note": "", "url": "", "summary": "Survey de 70 travaux d’XAI avec explications en langue naturelle, organisé en feuille de route : contexte, génération de l’explication, génération du message.", "rqNote": "Sa feuille de route recoupe votre pipeline ; utile pour structurer la section Related Work."}, {"id": "mantle", "kind": "paper", "domain": "nlp", "label": "MaNtLE: Model-agnostic Natural Language Explainer", "short": "MaNtLE", "authors": "R. R. Menon et al.", "year": "2023", "venue": "EMNLP", "status": "lu", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "Règles en langue naturelle à partir de 10 à 12 exemples. Plus fidèle que LIME à budget d’appels limité.", "url": "", "summary": "Modèle T5 entraîné sur 200 000 tâches synthétiques pour énoncer une règle en langue naturelle à partir de 10 à 12 exemples étiquetés par un classifieur. Plus fidèle que LIME à budget d’appels limité, et aide les utilisateurs à prédire le modèle.", "rqNote": "Alternative aux attributions pour des explications de groupe (RQ2). Ses difficultés avec les conjonctions et négations limitent la fidélité (RQ3)."}, {"id": "situated", "kind": "paper", "domain": "nlp", "label": "Situated Natural Language Explanations", "short": "Situated NLE", "authors": "", "year": "2024", "venue": "ACL", "status": "lu", "pioneer": false, "verify": true, "rq": ["RQ1", "RQ3"], "note": "Prompts « busy » / « detailed » : adapter l’explication à l’audience.", "url": "", "summary": "Les explications doivent être adaptées à l’audience. Compare des prompts « busy » et « detailed » et mesure longueur, diversité, concrétude, persuasion. Les grands modèles s’adaptent mieux.", "rqNote": "Moyen léger d’adapter la forme (RQ3) ; ne traite pas la fidélité."}, {"id": "n3", "kind": "axis", "domain": "nlp", "label": "Fidélité des explications de LLM", "short": "Fidélité des explications de LLM", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Les explications produites par les LLM reflètent-elles leur vrai raisonnement ?", "rqNote": "Raison principale d’ancrer les réponses sur des preuves calculées (RQ3)."}, {"id": "cot", "kind": "paper", "domain": "nlp", "label": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models", "short": "Chain-of-Thought", "authors": "J. Wei et al.", "year": "2022", "venue": "NeurIPS", "status": "a_lire", "pioneer": true, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Montre que demander des étapes de raisonnement intermédiaires améliore fortement les performances des grands modèles sur des tâches de raisonnement.", "rqNote": "Point de départ des débats sur la fidélité des explications des LLM (RQ3)."}, {"id": "turpin", "kind": "paper", "domain": "nlp", "label": "Language Models Don’t Always Say What They Think: Unfaithful Explanations in CoT Prompting", "short": "Turpin", "authors": "M. Turpin et al.", "year": "2023", "venue": "NeurIPS", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Montre que des explications chain-of-thought rationalisent des réponses influencées par des biais (par exemple l’ordre des options) sans jamais mentionner ces biais.", "rqNote": "Raison de ne pas se fier aux self-explanations du LLM et d’ancrer les réponses sur des preuves calculées (RQ3)."}, {"id": "atanasova", "kind": "paper", "domain": "nlp", "label": "Faithfulness Tests for Natural Language Explanations", "short": "Tests de fidélité", "authors": "P. Atanasova et al.", "year": "2023", "venue": "ACL", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "Test contrefactuel repris par SR-NLE.", "url": "", "summary": "Propose deux tests de fidélité des NLE : un test contrefactuel (insérer des mots qui changent la prédiction et vérifier qu’ils figurent dans l’explication) et un test de reconstruction de l’entrée.", "rqNote": "Test automatique directement réutilisable dans votre évaluation (RQ3)."}, {"id": "lanham", "kind": "paper", "domain": "nlp", "label": "Measuring Faithfulness in Chain-of-Thought Reasoning", "short": "Lanham", "authors": "T. Lanham et al.", "year": "2023", "venue": "arXiv", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Modifie le chain-of-thought (troncature, erreurs, paraphrase) pour voir si la réponse en dépend. La dépendance varie selon les tâches et diminue parfois avec la taille du modèle.", "rqNote": "Méthode d’intervention pour vérifier si une explication influence vraiment la réponse (RQ3)."}, {"id": "madsen", "kind": "paper", "domain": "nlp", "label": "Are Self-Explanations from Large Language Models Faithful?", "short": "Self-explanations", "authors": "A. Madsen, S. Chandar, S. Reddy", "year": "2024", "venue": "Findings of ACL", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Évalue la fidélité de self-explanations (contrefactuelles, importance, masquage) par des tests d’auto-cohérence. Le résultat dépend fortement du modèle et de la tâche.", "rqNote": "Confirme qu’il faut vérifier les explications du LLM au cas par cas (RQ3)."}, {"id": "n4", "kind": "axis", "domain": "nlp", "label": "Raffinement itératif", "short": "Raffinement itératif", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Boucles où un LLM critique et améliore sa propre sortie.", "rqNote": "Mécanisme possible de vérification avant réponse (RQ3)."}, {"id": "selfrefine", "kind": "paper", "domain": "nlp", "label": "Self-Refine: Iterative Refinement with Self-Feedback", "short": "Self-Refine", "authors": "A. Madaan et al.", "year": "2023", "venue": "NeurIPS", "status": "lu", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Un même LLM génère, critique puis raffine sa sortie en plusieurs itérations, sans entraînement. Gain d’environ 20 % sur sept tâches.", "rqNote": "Mécanisme de raffinement réutilisable avant de répondre (RQ3)."}, {"id": "reflexion", "kind": "paper", "domain": "nlp", "label": "Reflexion: Language Agents with Verbal Reinforcement Learning", "short": "Reflexion", "authors": "N. Shinn et al.", "year": "2023", "venue": "NeurIPS", "status": "lu", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Agents qui transforment le retour de l’environnement en réflexion textuelle, gardée en mémoire pour les essais suivants (Actor, Evaluator, Self-Reflection).", "rqNote": "La mémoire de réflexions ressemble à un modèle de l’utilisateur mis à jour au fil du dialogue (RQ1)."}, {"id": "crossrefine", "kind": "paper", "domain": "nlp", "label": "Cross-Refine: Improving Natural Language Explanation Generation by Learning in Tandem", "short": "Cross-Refine", "authors": "Q. Wang et al.", "year": "2025", "venue": "COLING", "status": "en_cours", "pioneer": false, "verify": true, "rq": ["RQ3"], "note": "", "url": "", "summary": "Deux LLM en tandem : un générateur produit l’explication, un critique donne feedback et suggestions pour la raffiner.", "rqNote": "Variante de vérification à deux modèles ; à comparer à SR-NLE (RQ3)."}, {"id": "srnle", "kind": "paper", "domain": "nlp", "label": "Self-Critique and Refinement for Faithful Natural Language Explanations", "short": "SR-NLE", "authors": "", "year": "2025", "venue": "", "status": "lu", "pioneer": false, "verify": true, "rq": ["RQ3"], "note": "Feedback par mots importants (IWF) : unfaithfulness de 54,8 % à 36 %.", "url": "", "summary": "Le modèle critique et raffine sa propre explication post-hoc. Le feedback sur les mots importants (IWF, par attention ou Integrated Gradients) réduit l’infidélité d’environ 55 % à 36 %.", "rqNote": "Montre comment injecter une attribution calculée pour rendre une NLE plus fidèle : modèle direct pour RQ3."}, {"id": "n5", "kind": "axis", "domain": "nlp", "label": "LLM comme explainers d’autres modèles", "short": "LLM comme explainers d’autres modèles", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Utiliser un LLM pour expliquer un autre modèle.", "rqNote": "Faisabilité et limites d’un LLM placé entre le modèle et l’utilisateur (RQ2, RQ3)."}, {"id": "kroeger", "kind": "paper", "domain": "nlp", "label": "Are Large Language Models Post Hoc Explainers?", "short": "LLM post-hoc", "authors": "N. Kroeger et al.", "year": "2023", "venue": "arXiv", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ2", "RQ3"], "note": "", "url": "", "summary": "Évalue si un LLM peut identifier les variables importantes d’un autre modèle par apprentissage en contexte sur des exemples perturbés. Résultats comparables à certaines méthodes post-hoc sur données tabulaires.", "rqNote": "Faisabilité d’un LLM explainer, mais fidélité à contrôler (RQ2, RQ3)."}, {"id": "zytek", "kind": "paper", "domain": "nlp", "label": "LLMs for XAI: Future Directions for Explaining Explanations", "short": "LLMs for XAI", "authors": "A. Zytek et al.", "year": "2024", "venue": "arXiv", "status": "a_lire", "pioneer": false, "verify": true, "rq": ["RQ3"], "note": "", "url": "", "summary": "Article de position sur l’usage des LLM pour transformer des explications de ML en récits lisibles : défis et directions.", "rqNote": "Proche de XAIStories ; liste de défis utile pour l’étape « Communicate »."}, {"id": "n6", "kind": "axis", "domain": "nlp", "label": "Dialogue, adaptation et Theory of Mind", "short": "Dialogue, adaptation et Theory of Mind", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Contraindre et adapter des agents conversationnels ; capacité des LLM à modéliser l’autre.", "rqNote": "Directement lié au modèle utilisateur (RQ1) et au contrôle du dialogue (RQ2)."}, {"id": "dfi", "kind": "paper", "domain": "nlp", "label": "Dialog Flow Induction for Constrainable LLM-Based Chatbots", "short": "Dialog Flow Induction", "authors": "", "year": "2024", "venue": "SIGDIAL", "status": "lu", "pioneer": false, "verify": true, "rq": ["RQ2"], "note": "", "url": "", "summary": "Génère automatiquement avec GPT-4 un flow de dialogue propre à un domaine (version intrinsèque et version guidée par des conversations réelles) pour contraindre un chatbot.", "rqNote": "Un flow de dialogue explicatif pourrait encadrer les tours possibles du système (RQ2)."}, {"id": "coconstr", "kind": "paper", "domain": "nlp", "label": "Investigating Co-Constructive Behavior of Large Language Models in Explanation Dialogues", "short": "LLM co-constructifs", "authors": "", "year": "2025", "venue": "SIGDIAL", "status": "lu", "pioneer": false, "verify": true, "rq": ["RQ1"], "note": "Le prompting fait émerger monitoring et scaffolding, sans gain de compréhension objective.", "url": "", "summary": "Étude utilisateur avec Llama 3.1 70B : un prompt « co-constructif » augmente les questions de vérification et l’engagement, mais pas la compréhension objective.", "rqNote": "Montre que le prompting seul ne suffit pas pour l’adaptation : argument pour un modèle utilisateur explicite (RQ1)."}, {"id": "kosinski", "kind": "paper", "domain": "nlp", "label": "Evaluating Large Language Models in Theory of Mind Tasks", "short": "ToM des LLM", "authors": "M. Kosinski", "year": "2024", "venue": "PNAS", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ1"], "note": "", "url": "", "summary": "Soumet des LLM à des tâches classiques de fausse croyance ; les modèles récents en réussissent une large part.", "rqNote": "Question ouverte : un LLM peut-il estimer seul les connaissances de l’utilisateur (RQ1) ?"}, {"id": "ullman", "kind": "paper", "domain": "nlp", "label": "Large Language Models Fail on Trivial Alterations to Theory-of-Mind Tasks", "short": "Ullman", "authors": "T. Ullman", "year": "2023", "venue": "arXiv", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ1"], "note": "", "url": "", "summary": "Des modifications triviales des tâches de théorie de l’esprit font échouer les LLM.", "rqNote": "Contre-argument : ne pas confier la modélisation de l’utilisateur au seul LLM (RQ1)."}, {"id": "n7", "kind": "axis", "domain": "nlp", "label": "Évaluation de la génération", "short": "Évaluation de la génération", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Évaluer automatiquement ou humainement des textes générés.", "rqNote": "Choix des métriques pour la partie langage de l’évaluation."}, {"id": "novikova", "kind": "paper", "domain": "nlp", "label": "Why We Need New Evaluation Metrics for NLG", "short": "Novikova", "authors": "J. Novikova et al.", "year": "2017", "venue": "EMNLP", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Montre que les métriques automatiques de NLG (BLEU, ROUGE…) corrèlent mal avec les jugements humains.", "rqNote": "Justifie une évaluation humaine ou par tâche, pas seulement par métriques de surface."}, {"id": "llmjudge", "kind": "paper", "domain": "nlp", "label": "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena", "short": "LLM-as-a-judge", "authors": "L. Zheng et al.", "year": "2023", "venue": "NeurIPS Datasets & Benchmarks", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Étudie les LLM comme juges : bon accord avec les humains, mais biais de position, de verbosité et d’auto-préférence.", "rqNote": "Option pour évaluer vos réponses à grande échelle, en contrôlant ces biais."}, {"id": "geval", "kind": "paper", "domain": "nlp", "label": "G-Eval: NLG Evaluation using GPT-4 with Better Human Alignment", "short": "G-Eval", "authors": "Y. Liu et al.", "year": "2023", "venue": "EMNLP", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ3"], "note": "", "url": "", "summary": "Évalue des textes générés avec GPT-4, chain-of-thought et formulaire de notation ; meilleure corrélation avec l’humain que les métriques classiques.", "rqNote": "Autre option d’évaluation automatique de la qualité linguistique."}, {"id": "d1", "kind": "axis", "domain": "dlg", "label": "Argumentation et dialogues : fondements", "short": "Argumentation et dialogues : fondements", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Les bases : cadres d’argumentation abstraits et typologie des dialogues.", "rqNote": "Vocabulaire commun avec votre collaborateur dialogues formels."}, {"id": "dung", "kind": "paper", "domain": "dlg", "label": "On the Acceptability of Arguments and its Fundamental Role in Nonmonotonic Reasoning, Logic Programming and n-Person Games", "short": "Dung", "authors": "P. M. Dung", "year": "1995", "venue": "Artificial Intelligence", "status": "a_lire", "pioneer": true, "verify": false, "rq": [], "note": "", "url": "", "summary": "Définit les cadres d’argumentation abstraits (arguments et attaques) et les sémantiques d’acceptabilité.", "rqNote": "Socle formel de tout le domaine 3."}, {"id": "walton", "kind": "paper", "domain": "dlg", "label": "Commitment in Dialogue: Basic Concepts of Interpersonal Reasoning", "short": "Walton & Krabbe", "authors": "D. Walton, E. Krabbe", "year": "1995", "venue": "SUNY Press (livre)", "status": "a_lire", "pioneer": true, "verify": false, "rq": ["RQ2"], "note": "Typologie des dialogues, dont l’information-seeking.", "url": "", "summary": "Typologie des dialogues (persuasion, négociation, enquête, délibération, recherche d’information, éristique) et notion d’engagements.", "rqNote": "Le dialogue explicatif se positionne dans cette typologie ; utile pour définir son protocole (RQ2)."}, {"id": "d2", "kind": "axis", "domain": "dlg", "label": "Argumentation graduelle (QBAF)", "short": "Argumentation graduelle (QBAF)", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Cadres d’argumentation quantitatifs bipolaires et sémantiques graduelles.", "rqNote": "Outil formel candidat pour représenter et mettre à jour l’état de l’utilisateur (RQ1)."}, {"id": "baroni18", "kind": "paper", "domain": "dlg", "label": "How Many Properties Do We Need for Gradual Argumentation?", "short": "Propriétés graduelles", "authors": "P. Baroni, A. Rago, F. Toni", "year": "2018", "venue": "AAAI", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ1"], "note": "", "url": "", "summary": "Étudie les propriétés que doivent satisfaire les sémantiques graduelles qui calculent la force des arguments à partir des attaques et des supports.", "rqNote": "Choisir une sémantique pour mettre à jour un score de l’utilisateur (RQ1)."}, {"id": "baroni19", "kind": "paper", "domain": "dlg", "label": "From Fine-Grained Properties to Broad Principles for Gradual Argumentation: A Principled Spectrum", "short": "Principes graduels", "authors": "P. Baroni, A. Rago, F. Toni", "year": "2019", "venue": "International Journal of Approximate Reasoning", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ1"], "note": "", "url": "", "summary": "Organise ces propriétés en principes généraux et en spectre de sémantiques graduelles pour les cadres bipolaires.", "rqNote": "Référence de base pour les QBAF utilisés dans les travaux d’Umeå."}, {"id": "d3", "kind": "axis", "domain": "dlg", "label": "Argumentation et XAI", "short": "Argumentation et XAI", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Argumentation comme moyen de produire ou structurer des explications.", "rqNote": "Pont direct entre dialogues formels et XAI (RQ2, RQ3)."}, {"id": "cyras", "kind": "paper", "domain": "dlg", "label": "Argumentative XAI: A Survey", "short": "Argumentative XAI", "authors": "K. Čyras et al.", "year": "2021", "venue": "IJCAI", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ2", "RQ3"], "note": "", "url": "", "summary": "Survey de l’XAI argumentative : expliquer des modèles en les traduisant en argumentation, et utiliser des dialogues argumentatifs pour expliquer.", "rqNote": "Pont direct entre XAI et dialogues formels ; montre des explications interactives et vérifiables (RQ2, RQ3)."}, {"id": "vassiliades", "kind": "paper", "domain": "dlg", "label": "Argumentation and Explainable Artificial Intelligence: A Survey", "short": "Argumentation & XAI", "authors": "A. Vassiliades, N. Bassiliades, T. Patkos", "year": "2021", "venue": "Knowledge Engineering Review", "status": "a_lire", "pioneer": false, "verify": false, "rq": ["RQ2"], "note": "", "url": "", "summary": "Survey de l’argumentation pour l’explicabilité, par domaine d’application.", "rqNote": "Complète Čyras ; repérer des applications proches de la vôtre."}, {"id": "interrogating", "kind": "paper", "domain": "dlg", "label": "Interrogating the Black Box: Transparency through Information-Seeking Dialogues", "short": "Interrogating the Black Box", "authors": "A. Brännström, J. C. Nieves", "year": "2022", "venue": "", "status": "a_lire", "pioneer": false, "verify": true, "rq": ["RQ1", "RQ2"], "note": "Pont direct entre dialogues formels et XAI. Lecture prioritaire.", "url": "", "summary": "D’après son titre et le groupe d’Umeå, propose d’utiliser des dialogues formels de recherche d’information pour interroger un système opaque et améliorer sa transparence. Résumé à confirmer à la lecture.", "rqNote": "Probablement le lien le plus direct entre dialogues formels et votre système d’explication (RQ1, RQ2)."}, {"id": "d4", "kind": "axis", "domain": "dlg", "label": "Modéliser l’interlocuteur", "short": "Modéliser l’interlocuteur", "authors": "", "year": "", "venue": "", "status": "a_lire", "pioneer": false, "verify": false, "rq": [], "note": "", "url": "", "summary": "Représenter formellement les dispositions de l’interlocuteur pour choisir l’action suivante.", "rqNote": "Modèle le plus proche de ce que demande RQ1, à transposer aux besoins explicatifs."}, {"id": "goalhiding", "kind": "paper", "domain": "dlg", "label": "Goal-hiding Information-seeking Dialogues: A Formal Framework", "short": "Goal-hiding dialogues", "authors": "A. Brännström, V. Dignum, J. C. Nieves", "year": "2024", "venue": "International Journal of Approximate Reasoning, vol. 177", "status": "lu", "pioneer": false, "verify": false, "rq": ["RQ1", "RQ2"], "note": "QBAF de willingness, graphe croyances-sujets, planification épistémique des sujets. Recommandé par le collaborateur dialogues formels.", "url": "https://www.sciencedirect.com/science/article/pii/S0888613X24002123", "summary": "Un agent seeker repousse son sujet cible jusqu’à ce que la disposition (willingness) de l’interlocuteur soit suffisante. La willingness est représentée par un QBAF mis à jour à partir des croyances exprimées, via un graphe croyances-sujets.", "rqNote": "Transposition : remplacer la willingness par l’état de compréhension et les besoins de l’utilisateur, et le choix du sujet par le choix de l’intervention explicative (RQ1, RQ2)."}, {"id": "empathy", "kind": "paper", "domain": "dlg", "label": "A Formal Understanding of Computational Empathy in Interactive Agents", "short": "Empathie computationnelle", "authors": "A. Brännström, J. Wester, J. C. Nieves", "year": "2024", "venue": "Cognitive Systems Research", "status": "lu", "pioneer": false, "verify": true, "rq": ["RQ1"], "note": "Perceive, Theory of Mind, Act : la représentation de l’interlocuteur doit guider l’action. Recommandé par le collaborateur dialogues formels.", "url": "https://www.sciencedirect.com/science/article/pii/S1389041723001377", "summary": "Définition formelle et multidimensionnelle de l’empathie computationnelle (percevoir, théorie de l’esprit, agir, manifester, ratification, interpersonnel), avec ontologie OWL et évaluation de Replika et Wysa.", "rqNote": "Le principe « la représentation de l’autre doit guider l’action » est exactement le lien entre RQ1 et RQ2."}], "edges": [{"id": "e1", "source": "root", "target": "xai", "rel": "contient"}, {"id": "e2", "source": "root", "target": "nlp", "rel": "contient"}, {"id": "e3", "source": "root", "target": "dlg", "rel": "contient"}, {"id": "e4", "source": "xai", "target": "x1", "rel": "contient"}, {"id": "e5", "source": "x1", "target": "lipton", "rel": "contient"}, {"id": "e6", "source": "x1", "target": "doshi", "rel": "contient"}, {"id": "e7", "source": "x1", "target": "miller", "rel": "contient"}, {"id": "e8", "source": "xai", "target": "x2", "rel": "contient"}, {"id": "e9", "source": "x2", "target": "lime", "rel": "contient"}, {"id": "e10", "source": "x2", "target": "shap", "rel": "contient"}, {"id": "e11", "source": "x2", "target": "ig", "rel": "contient"}, {"id": "e12", "source": "x2", "target": "anchors", "rel": "contient"}, {"id": "e13", "source": "xai", "target": "x3", "rel": "contient"}, {"id": "e14", "source": "x3", "target": "wachter", "rel": "contient"}, {"id": "e15", "source": "x3", "target": "dice", "rel": "contient"}, {"id": "e16", "source": "x3", "target": "karimi", "rel": "contient"}, {"id": "e17", "source": "x3", "target": "naturalxai", "rel": "contient"}, {"id": "e18", "source": "xai", "target": "x4", "rel": "contient"}, {"id": "e19", "source": "x4", "target": "tcav", "rel": "contient"}, {"id": "e20", "source": "xai", "target": "x5", "rel": "contient"}, {"id": "e21", "source": "x5", "target": "liao", "rel": "contient"}, {"id": "e22", "source": "x5", "target": "kaur", "rel": "contient"}, {"id": "e23", "source": "x5", "target": "alufaisan", "rel": "contient"}, {"id": "e24", "source": "x5", "target": "bucinca", "rel": "contient"}, {"id": "e25", "source": "x5", "target": "prefperf", "rel": "contient"}, {"id": "e26", "source": "xai", "target": "x6", "rel": "contient"}, {"id": "e27", "source": "x6", "target": "sokol", "rel": "contient"}, {"id": "e28", "source": "x6", "target": "rohlfing", "rel": "contient"}, {"id": "e29", "source": "x6", "target": "lakkaraju", "rel": "contient"}, {"id": "e30", "source": "x6", "target": "ttm", "rel": "contient"}, {"id": "e31", "source": "x6", "target": "interrolang", "rel": "contient"}, {"id": "e32", "source": "x6", "target": "convxai", "rel": "contient"}, {"id": "e33", "source": "x6", "target": "llmcheckup", "rel": "contient"}, {"id": "e34", "source": "x6", "target": "xaistories", "rel": "contient"}, {"id": "e35", "source": "x6", "target": "cocoxplain", "rel": "contient"}, {"id": "e36", "source": "xai", "target": "x7", "rel": "contient"}, {"id": "e37", "source": "x7", "target": "hoffman", "rel": "contient"}, {"id": "e38", "source": "x7", "target": "jacovi", "rel": "contient"}, {"id": "e39", "source": "x7", "target": "hase", "rel": "contient"}, {"id": "e40", "source": "x7", "target": "nauta", "rel": "contient"}, {"id": "e41", "source": "nlp", "target": "n1", "rel": "contient"}, {"id": "e42", "source": "n1", "target": "transformer", "rel": "contient"}, {"id": "e43", "source": "n1", "target": "t5", "rel": "contient"}, {"id": "e44", "source": "n1", "target": "distill", "rel": "contient"}, {"id": "e45", "source": "nlp", "target": "n2", "rel": "contient"}, {"id": "e46", "source": "n2", "target": "esnli", "rel": "contient"}, {"id": "e47", "source": "n2", "target": "cose", "rel": "contient"}, {"id": "e48", "source": "n2", "target": "makeup", "rel": "contient"}, {"id": "e49", "source": "n2", "target": "teachme", "rel": "contient"}, {"id": "e50", "source": "n2", "target": "mariotti", "rel": "contient"}, {"id": "e51", "source": "n2", "target": "cambria", "rel": "contient"}, {"id": "e52", "source": "n2", "target": "mantle", "rel": "contient"}, {"id": "e53", "source": "n2", "target": "situated", "rel": "contient"}, {"id": "e54", "source": "nlp", "target": "n3", "rel": "contient"}, {"id": "e55", "source": "n3", "target": "cot", "rel": "contient"}, {"id": "e56", "source": "n3", "target": "turpin", "rel": "contient"}, {"id": "e57", "source": "n3", "target": "atanasova", "rel": "contient"}, {"id": "e58", "source": "n3", "target": "lanham", "rel": "contient"}, {"id": "e59", "source": "n3", "target": "madsen", "rel": "contient"}, {"id": "e60", "source": "nlp", "target": "n4", "rel": "contient"}, {"id": "e61", "source": "n4", "target": "selfrefine", "rel": "contient"}, {"id": "e62", "source": "n4", "target": "reflexion", "rel": "contient"}, {"id": "e63", "source": "n4", "target": "crossrefine", "rel": "contient"}, {"id": "e64", "source": "n4", "target": "srnle", "rel": "contient"}, {"id": "e65", "source": "nlp", "target": "n5", "rel": "contient"}, {"id": "e66", "source": "n5", "target": "kroeger", "rel": "contient"}, {"id": "e67", "source": "n5", "target": "zytek", "rel": "contient"}, {"id": "e68", "source": "nlp", "target": "n6", "rel": "contient"}, {"id": "e69", "source": "n6", "target": "dfi", "rel": "contient"}, {"id": "e70", "source": "n6", "target": "coconstr", "rel": "contient"}, {"id": "e71", "source": "n6", "target": "kosinski", "rel": "contient"}, {"id": "e72", "source": "n6", "target": "ullman", "rel": "contient"}, {"id": "e73", "source": "nlp", "target": "n7", "rel": "contient"}, {"id": "e74", "source": "n7", "target": "novikova", "rel": "contient"}, {"id": "e75", "source": "n7", "target": "llmjudge", "rel": "contient"}, {"id": "e76", "source": "n7", "target": "geval", "rel": "contient"}, {"id": "e77", "source": "dlg", "target": "d1", "rel": "contient"}, {"id": "e78", "source": "d1", "target": "dung", "rel": "contient"}, {"id": "e79", "source": "d1", "target": "walton", "rel": "contient"}, {"id": "e80", "source": "dlg", "target": "d2", "rel": "contient"}, {"id": "e81", "source": "d2", "target": "baroni18", "rel": "contient"}, {"id": "e82", "source": "d2", "target": "baroni19", "rel": "contient"}, {"id": "e83", "source": "dlg", "target": "d3", "rel": "contient"}, {"id": "e84", "source": "d3", "target": "cyras", "rel": "contient"}, {"id": "e85", "source": "d3", "target": "vassiliades", "rel": "contient"}, {"id": "e86", "source": "d3", "target": "interrogating", "rel": "contient"}, {"id": "e87", "source": "dlg", "target": "d4", "rel": "contient"}, {"id": "e88", "source": "d4", "target": "goalhiding", "rel": "contient"}, {"id": "e89", "source": "d4", "target": "empathy", "rel": "contient"}, {"id": "e90", "source": "srnle", "target": "ig", "rel": "utilise"}, {"id": "e91", "source": "srnle", "target": "atanasova", "rel": "utilise"}, {"id": "e92", "source": "srnle", "target": "selfrefine", "rel": "etend"}, {"id": "e93", "source": "crossrefine", "target": "selfrefine", "rel": "proche"}, {"id": "e94", "source": "reflexion", "target": "selfrefine", "rel": "proche"}, {"id": "e95", "source": "xaistories", "target": "shap", "rel": "utilise"}, {"id": "e96", "source": "xaistories", "target": "dice", "rel": "utilise"}, {"id": "e97", "source": "zytek", "target": "xaistories", "rel": "proche"}, {"id": "e98", "source": "ttm", "target": "shap", "rel": "utilise"}, {"id": "e99", "source": "ttm", "target": "lime", "rel": "utilise"}, {"id": "e100", "source": "llmcheckup", "target": "ttm", "rel": "etend"}, {"id": "e101", "source": "interrolang", "target": "ttm", "rel": "etend"}, {"id": "e102", "source": "convxai", "target": "ttm", "rel": "proche"}, {"id": "e103", "source": "cocoxplain", "target": "rohlfing", "rel": "inspire"}, {"id": "e104", "source": "coconstr", "target": "rohlfing", "rel": "inspire"}, {"id": "e105", "source": "mantle", "target": "lime", "rel": "compare"}, {"id": "e106", "source": "mantle", "target": "anchors", "rel": "compare"}, {"id": "e107", "source": "mantle", "target": "t5", "rel": "utilise"}, {"id": "e108", "source": "mantle", "target": "hase", "rel": "utilise"}, {"id": "e109", "source": "naturalxai", "target": "wachter", "rel": "etend"}, {"id": "e110", "source": "naturalxai", "target": "karimi", "rel": "proche"}, {"id": "e111", "source": "dice", "target": "wachter", "rel": "etend"}, {"id": "e112", "source": "goalhiding", "target": "baroni19", "rel": "utilise"}, {"id": "e113", "source": "goalhiding", "target": "walton", "rel": "inspire"}, {"id": "e114", "source": "cyras", "target": "dung", "rel": "inspire"}, {"id": "e115", "source": "baroni19", "target": "dung", "rel": "etend"}, {"id": "e116", "source": "interrogating", "target": "walton", "rel": "inspire"}, {"id": "e117", "source": "interrogating", "target": "lakkaraju", "rel": "proche"}, {"id": "e118", "source": "lakkaraju", "target": "sokol", "rel": "proche"}, {"id": "e119", "source": "prefperf", "target": "bucinca", "rel": "proche"}, {"id": "e120", "source": "makeup", "target": "esnli", "rel": "critique"}, {"id": "e121", "source": "turpin", "target": "cot", "rel": "critique"}, {"id": "e122", "source": "lanham", "target": "cot", "rel": "critique"}, {"id": "e123", "source": "situated", "target": "miller", "rel": "inspire"}, {"id": "e124", "source": "kroeger", "target": "lime", "rel": "compare"}, {"id": "e125", "source": "ullman", "target": "kosinski", "rel": "critique"}, {"id": "e126", "source": "goalhiding", "target": "empathy", "rel": "proche"}, {"id": "e127", "source": "cocoxplain", "target": "ttm", "rel": "compare"}, {"id": "e128", "source": "liao", "target": "miller", "rel": "inspire"}, {"id": "e129", "source": "jacovi", "target": "esnli", "rel": "critique"}]}</script>
+<script id="app">(function(){
+'use strict';
+const BODY = `
+<header>
+  <h1>Carte des lectures : explications adaptatives</h1>
+  <span id="stats"></span>
+  <span class="grow"></span>
+  <button class="btn editonly" id="btnAdd" type="button">Ajouter un nœud</button>
+  <button class="btn editonly" id="btnLink" type="button">Lier deux nœuds</button>
+  <button class="btn" id="btnData" type="button">Exporter / importer</button>
+  <button class="btn primary editonly" id="btnSave" type="button" disabled>Enregistré</button>
+</header>
+<div id="toolbar">
+  <input id="q" type="search" placeholder="Chercher un titre, un auteur…" aria-label="Rechercher">
+  <div class="chips" id="domChips"></div>
+  <div class="chips" id="rqChips"><span class="flabel">Questions :</span></div>
+  <select class="small" id="fStatus" aria-label="Statut de lecture">
+    <option value="all">Tous les statuts</option><option value="lu">Lus</option><option value="en_cours">En cours</option><option value="a_lire">À lire</option>
+  </select>
+  <label class="flabel"><input type="checkbox" id="fPio"> Pionniers</label>
+  <label class="flabel"><input type="checkbox" id="fVer"> À vérifier</label>
+</div>
+<div id="linkbar"><span id="linkHint">Cliquez sur la source, puis sur la cible.</span>
+  <label>Relation <select id="linkRel"></select></label><span class="grow"></span><button type="button" id="linkCancel">Annuler</button></div>
+<div id="banner"><span id="bannerText"></span><button class="btn" id="bannerRestore" type="button">Restaurer</button><button class="btn" id="bannerDrop" type="button">Ignorer</button></div>
+<main>
+  <div id="canvas">
+    <svg id="graph" role="img" aria-label="Graphe des lectures"><defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="var(--edgex)"/></marker>
+      <marker id="arrc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="var(--crit)"/></marker>
+      <marker id="arrs" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="var(--sel)"/></marker>
+    </defs><g id="vp"><g id="gE"></g><g id="gN"></g></g></svg>
+    <div id="legend"></div>
+    <div id="zoomctl"><button class="btn" id="zIn" type="button" aria-label="Zoomer">+</button><button class="btn" id="zOut" type="button" aria-label="Dézoomer">−</button><button class="btn" id="zFit" type="button">Recentrer</button></div>
+  </div>
+  <aside id="panel" aria-live="polite"></aside>
+</main>
+<div id="toast" role="status"></div>
+<dialog id="dlg">
+  <h2 style="font-family:Literata,Georgia,serif;margin:0 0 8px;font-size:19px">Exporter ou importer la carte</h2>
+  <p style="margin:0 0 10px;color:var(--muted)">Copiez ce JSON pour le sauvegarder, ou collez un JSON exporté puis remplacez la carte.</p>
+  <textarea id="dlgText" spellcheck="false"></textarea>
+  <div class="actions"><button class="btn" id="dlgCopy" type="button">Copier</button><button class="btn" id="dlgDl" type="button" hidden>Télécharger</button><button class="btn editonly" id="dlgImport" type="button">Remplacer la carte</button><span class="grow"></span><button class="btn" id="dlgClose" type="button">Fermer</button></div>
+</dialog>`;
+const APP_SRC = document.currentScript ? document.currentScript.textContent : '';
+const DATA_SRC = document.getElementById('graph-data') ? document.getElementById('graph-data').textContent : '{"nodes":[],"edges":[]}';
+document.body.insertAdjacentHTML('afterbegin', BODY);
+
+const DOM = {root:{name:'Racine',c:'var(--root)'},xai:{name:'XAI',c:'var(--xai)'},nlp:{name:'NLP',c:'var(--nlp)'},dlg:{name:'Dialogues formels',c:'var(--dlg)'}};
+const RQ = {RQ1:'Comprendre les besoins',RQ2:'Décider quoi expliquer',RQ3:'Adapter fidèlement'};
+const REL = {contient:'contient',utilise:'utilise',etend:'étend',inspire:'s’inspire de',compare:'compare à',proche:'proche de',critique:'critique'};
+const STATUS = {lu:'Lu',en_cours:'En cours',a_lire:'À lire'};
+const KIND = {root:'Racine',domain:'Domaine',axis:'Axe',paper:'Article'};
+const R = {root:26,domain:19,axis:11,paper:7};
+const $ = id => document.getElementById(id);
+
+let state = JSON.parse(DATA_SRC);
+let byId = new Map();
+let sel = null, linkMode = false, linkFrom = null, readOnly = false, dirty = false, hot = null, pendingDel = false;
+const F = {doms:new Set(['xai','nlp','dlg']), rqs:new Set(), status:'all', pio:false, ver:false, q:''};
+const DRAFT = 'kg-adaptive-nle-draft';
+const STANDALONE = !(window.claude && typeof window.claude.use === 'function');
+function blobDownload(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}
+const artifactP = (window.claude && typeof window.claude.use === 'function') ? window.claude.use('artifact').catch(()=>null) : Promise.resolve(null);
+const downloadsP = (window.claude && typeof window.claude.use === 'function') ? window.claude.use('downloads').catch(()=>null) : Promise.resolve(null);
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),3200);}
+function uid(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function core(){return JSON.stringify({nodes:state.nodes,edges:state.edges});}
+function nodeName(n){return n.kind==='paper'?(n.short||n.label)+(n.year?' ('+n.year+')':''):n.label;}
+
+/* ---------- layout ---------- */
+function seedLayout(){
+  const nodes=state.nodes, map=new Map(nodes.map(n=>[n.id,n])), kids={};
+  state.edges.forEach(e=>{if(e.rel==='contient'){(kids[e.source]=kids[e.source]||[]).push(e.target);}});
+  const ang={xai:-150,nlp:-30,dlg:90}; const rad=a=>a*Math.PI/180;
+  const root=map.get('root')||nodes.find(n=>n.kind==='root'); if(root){root.x=0;root.y=0;}
+  nodes.filter(n=>n.kind==='domain').forEach((d,i)=>{const a=rad(ang[d.domain]!=null?ang[d.domain]:i*120);d.x=Math.cos(a)*330;d.y=Math.sin(a)*330;
+    const ax=(kids[d.id]||[]).map(id=>map.get(id)).filter(Boolean);
+    ax.forEach((x,j)=>{const span=150,aa=rad((ang[d.domain]||0)-span/2+span*(ax.length>1?j/(ax.length-1):.5));x.x=d.x+Math.cos(aa)*240;x.y=d.y+Math.sin(aa)*240;
+      const ps=(kids[x.id]||[]).map(id=>map.get(id)).filter(Boolean);
+      ps.forEach((p,k)=>{const b=Math.atan2(x.y-d.y,x.x-d.x)-1.1+2.2*(ps.length>1?k/(ps.length-1):.5);p.x=x.x+Math.cos(b)*95;p.y=x.y+Math.sin(b)*95;});});});
+  nodes.forEach((n,i)=>{if(n.x==null){n.x=Math.cos(i)*500;n.y=Math.sin(i)*500;}});
+  if(typeof d3==='undefined')return;
+  const links=state.edges.filter(e=>map.has(e.source)&&map.has(e.target)).map(e=>({source:e.source,target:e.target,rel:e.rel}));
+  const dist={domain:330,axis:230,paper:90};
+  if(root){root.fx=0;root.fy=0;}
+  const sim=d3.forceSimulation(nodes)
+    .force('link',d3.forceLink(links).id(d=>d.id).distance(l=>l.rel==='contient'?(dist[l.target.kind]||120):200).strength(l=>l.rel==='contient'?.8:.02))
+    .force('charge',d3.forceManyBody().strength(d=>-R[d.kind]*30))
+    .force('collide',d3.forceCollide(d=>R[d.kind]+(d.kind==='paper'?30:44)))
+    .stop();
+  for(let i=0;i<350;i++)sim.tick();
+  nodes.forEach(n=>{n.x=Math.round(n.x);n.y=Math.round(n.y);delete n.vx;delete n.vy;delete n.fx;delete n.fy;delete n.index;});
+}
+
+/* ---------- filters ---------- */
+function matches(n){
+  if(n.kind==='root')return true;
+  if(!F.doms.has(n.domain))return false;
+  if(n.kind!=='paper')return !(F.q||F.rqs.size||F.status!=='all'||F.pio||F.ver)||true;
+  if(F.rqs.size&&!n.rq.some(r=>F.rqs.has(r)))return false;
+  if(F.status!=='all'&&n.status!==F.status)return false;
+  if(F.pio&&!n.pioneer)return false;
+  if(F.ver&&!n.verify)return false;
+  if(F.q){const h=(n.label+' '+n.short+' '+n.authors+' '+n.venue+' '+n.year+' '+(n.summary||'')+' '+(n.rqNote||'')+' '+(n.note||'')).toLowerCase();if(!h.includes(F.q))return false;}
+  return true;
+}
+function isActiveFilter(){return !!(F.q||F.rqs.size||F.status!=='all'||F.pio||F.ver);}
+
+/* ---------- render ---------- */
+let svg,vp,zoom,gE,gN,kNow=1;
+function initSvg(){
+  svg=d3.select('#graph');vp=d3.select('#vp');gE=d3.select('#gE');gN=d3.select('#gN');
+  zoom=d3.zoom().scaleExtent([.15,3.5]).on('zoom',ev=>{vp.attr('transform',ev.transform);kNow=ev.transform.k;
+    svg.classed('far',kNow<.95).classed('near',kNow>=1.25);});
+  svg.call(zoom).on('dblclick.zoom',null);
+  svg.on('click',ev=>{if(ev.target===svg.node()){if(linkMode){return;}select(null);}});
+  $('zIn').onclick=()=>svg.transition().duration(200).call(zoom.scaleBy,1.3);
+  $('zOut').onclick=()=>svg.transition().duration(200).call(zoom.scaleBy,1/1.3);
+  $('zFit').onclick=()=>fit(true);
+}
+function fit(anim){
+  const ns=state.nodes; if(!ns.length)return;
+  const xs=ns.map(n=>n.x),ys=ns.map(n=>n.y),pad=60;
+  const x0=Math.min(...xs)-pad,x1=Math.max(...xs)+pad,y0=Math.min(...ys)-pad,y1=Math.max(...ys)+pad;
+  const box=$('graph').getBoundingClientRect();const w=box.width||800,h=box.height||600;
+  const k=Math.min(w/(x1-x0),h/(y1-y0),1.4);
+  const t=d3.zoomIdentity.translate(w/2-k*(x0+x1)/2,h/2-k*(y0+y1)/2).scale(k);
+  (anim?svg.transition().duration(350):svg).call(zoom.transform,t);
+}
+function nodeColor(n){return (DOM[n.domain]||DOM.root).c;}
+function render(){
+  byId=new Map(state.nodes.map(n=>[n.id,n]));
+  state.edges=state.edges.filter(e=>byId.has(e.source)&&byId.has(e.target));
+  const es=gE.selectAll('g.edge').data(state.edges,d=>d.id);
+  es.exit().remove();
+  const ee=es.enter().append('g');
+  ee.append('line').attr('class','vis');ee.append('line').attr('class','hit');ee.append('text');
+  ee.on('click',(ev,d)=>{ev.stopPropagation();if(!linkMode)select({type:'edge',id:d.id});})
+    .on('mouseenter',(ev,d)=>{hot={type:'edge',id:d.id};classes();}).on('mouseleave',()=>{hot=null;classes();});
+  const em=ee.merge(es);
+  em.attr('class',d=>'edge rel-'+d.rel);
+  em.select('text').text(d=>REL[d.rel]||d.rel);
+  const ns=gN.selectAll('g.node').data(state.nodes,d=>d.id);
+  ns.exit().remove();
+  const ne=ns.enter().append('g');
+  ne.append('circle').attr('class','ring');ne.append('circle').attr('class','body');ne.append('text');
+  ne.on('click',(ev,d)=>{ev.stopPropagation();onNodeClick(d);})
+    .on('mouseenter',(ev,d)=>{hot={type:'node',id:d.id};classes();}).on('mouseleave',()=>{hot=null;classes();})
+    .call(d3.drag().clickDistance(4)
+      .on('start',function(ev){if(readOnly)return;d3.select(this).raise();})
+      .on('drag',function(ev,d){if(readOnly)return;d.x=Math.round(ev.x);d.y=Math.round(ev.y);d._moved=true;positions();})
+      .on('end',function(ev,d){if(d._moved){delete d._moved;markDirty();}}));
+  const nm=ne.merge(ns);
+  nm.attr('class',d=>'node k-'+d.kind+(d.verify?' verify':''));
+  nm.select('circle.body').attr('r',d=>R[d.kind])
+    .attr('fill',d=>{const c=nodeColor(d);if(d.kind!=='paper')return c;return d.status==='lu'?c:(d.status==='en_cours'?'url(#half-'+d.domain+')':'var(--surface)');})
+    .attr('stroke',d=>d.kind==='paper'?nodeColor(d):'var(--surface)');
+  nm.select('circle.ring').attr('r',d=>R[d.kind]+4.5).attr('stroke',d=>d.pioneer?nodeColor(d):'none');
+  nm.select('text').text(d=>d.kind==='paper'?nodeName(d):(d.short&&d.kind==='root'?d.short:d.label))
+    .attr('dy',d=>d.kind==='domain'?-(R.domain+9):R[d.kind]+(d.kind==='paper'?13:17));
+  positions();classes();stats();
+}
+function ensureHalfPatterns(){
+  const defs=d3.select('#graph defs');
+  ['xai','nlp','dlg'].forEach(k=>{if(document.getElementById('half-'+k))return;
+    const g=defs.append('linearGradient').attr('id','half-'+k).attr('x1','0').attr('x2','0').attr('y1','0').attr('y2','1');
+    g.append('stop').attr('offset','50%').attr('stop-color','var(--surface)');g.append('stop').attr('offset','50%').attr('stop-color',DOM[k].c);});
+}
+function positions(){
+  gN.selectAll('g.node').attr('transform',d=>`translate(${d.x},${d.y})`);
+  gE.selectAll('g.edge').each(function(d){
+    const s=byId.get(d.source),t=byId.get(d.target);if(!s||!t)return;
+    const dx=t.x-s.x,dy=t.y-s.y,len=Math.hypot(dx,dy)||1,ux=dx/len,uy=dy/len;
+    const a=R[s.kind]+2,b=R[t.kind]+(d.rel==='contient'?2:6);
+    const x1=s.x+ux*a,y1=s.y+uy*a,x2=t.x-ux*b,y2=t.y-uy*b;
+    const g=d3.select(this);
+    g.selectAll('line').attr('x1',x1).attr('y1',y1).attr('x2',x2).attr('y2',y2);
+    g.select('text').attr('x',(x1+x2)/2).attr('y',(y1+y2)/2-4).attr('text-anchor','middle');
+  });
+}
+function classes(){
+  const act=isActiveFilter(), sid=sel&&sel.type==='node'?sel.id:null, eid=sel&&sel.type==='edge'?sel.id:null;
+  const hn=hot&&hot.type==='node'?hot.id:null, he=hot&&hot.type==='edge'?hot.id:null;
+  const ok=new Map(state.nodes.map(n=>[n.id,matches(n)]));
+  gN.selectAll('g.node')
+    .classed('dim',d=>{if(!ok.get(d.id))return true;if(act&&d.kind!=='paper'&&d.kind!=='root'){return false;}return false;})
+    .classed('is-sel',d=>d.id===sid).classed('is-hot',d=>d.id===hn).classed('is-from',d=>linkFrom===d.id)
+    .classed('is-match',d=>act&&d.kind==='paper'&&ok.get(d.id));
+  gE.selectAll('g.edge')
+    .classed('dim',d=>!ok.get(d.source)||!ok.get(d.target)||(act&&d.rel==='contient'&&byId.get(d.target).kind==='paper'&&!ok.get(d.target)))
+    .classed('is-sel',d=>d.id===eid).classed('is-hot',d=>d.id===he||(hn&&(d.source===hn||d.target===hn))||(sid&&(d.source===sid||d.target===sid)))
+    .each(function(d){const l=d3.select(this).select('line.vis');const hl=this.classList.contains('is-sel')||this.classList.contains('is-hot');
+      l.attr('marker-end',d.rel==='contient'?null:(hl?'url(#arrs)':(d.rel==='critique'?'url(#arrc)':'url(#arr)')));});
+}
+function stats(){
+  const p=state.nodes.filter(n=>n.kind==='paper');
+  const c=s=>p.filter(n=>n.status===s).length;
+  $('stats').textContent=`${p.length} articles : ${c('lu')} lus, ${c('en_cours')} en cours, ${c('a_lire')} à lire`;
+}
+
+/* ---------- selection & panel ---------- */
+function select(s){sel=s;pendingDel=false;classes();panel();}
+function onNodeClick(d){
+  if(linkMode){
+    if(!linkFrom){linkFrom=d.id;$('linkHint').textContent='Source : '+nodeName(d)+'. Cliquez maintenant sur la cible.';classes();return;}
+    if(linkFrom===d.id)return;
+    const e={id:uid('e'),source:linkFrom,target:d.id,rel:$('linkRel').value};
+    state.edges.push(e);stopLink();render();select({type:'edge',id:e.id});markDirty();toast('Lien créé');return;
+  }
+  select({type:'node',id:d.id});
+}
+function startLink(from){if(readOnly)return;linkMode=true;linkFrom=from||null;$('btnLink').classList.add('on');$('linkbar').classList.add('show');
+  $('linkHint').textContent=from?'Source : '+nodeName(byId.get(from))+'. Cliquez maintenant sur la cible.':'Cliquez sur la source, puis sur la cible.';classes();}
+function stopLink(){linkMode=false;linkFrom=null;$('btnLink').classList.remove('on');$('linkbar').classList.remove('show');classes();}
+
+function opt(map,v){return Object.entries(map).map(([k,l])=>`<option value="${k}"${k===v?' selected':''}>${esc(l)}</option>`).join('');}
+function panel(){
+  const P=$('panel');
+  if(!sel){P.innerHTML=helpHtml();bindHelp();return;}
+  if(sel.type==='edge'){
+    const e=state.edges.find(x=>x.id===sel.id);if(!e){select(null);return;}
+    const s=byId.get(e.source),t=byId.get(e.target);
+    P.innerHTML=`<h2>Lien</h2>
+    <p><button class="btn" data-go="${esc(s.id)}" type="button">${esc(nodeName(s))}</button></p>
+    <div class="field"><label for="eRel">Relation</label><select id="eRel" ${readOnly?'disabled':''}>${opt(REL,e.rel)}</select></div>
+    <p><button class="btn" data-go="${esc(t.id)}" type="button">${esc(nodeName(t))}</button></p>
+    <div class="actions editonly"><button class="btn" id="eSwap" type="button">Inverser le sens</button><button class="btn danger" id="eDel" type="button">Supprimer le lien</button></div>`;
+    P.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>select({type:'node',id:b.dataset.go}));
+    $('eRel').onchange=ev=>{e.rel=ev.target.value;render();markDirty();};
+    if($('eSwap'))$('eSwap').onclick=()=>{[e.source,e.target]=[e.target,e.source];render();markDirty();};
+    if($('eDel'))$('eDel').onclick=()=>{state.edges=state.edges.filter(x=>x!==e);select(null);render();markDirty();toast('Lien supprimé');};
+    return;
+  }
+  const n=byId.get(sel.id);if(!n){select(null);return;}
+  const ro=readOnly?'disabled':'';
+  const isP=n.kind==='paper';
+  const conns=state.edges.filter(e=>e.source===n.id||e.target===n.id).map(e=>{
+    const out=e.source===n.id,o=byId.get(out?e.target:e.source);
+    const rel=out?(REL[e.rel]||e.rel):('← '+(REL[e.rel]||e.rel));
+    return `<li><span class="rel">${esc(rel)}</span><button class="go" type="button" data-go="${esc(o.id)}">${esc(nodeName(o))}</button><button class="x editonly" type="button" data-del="${esc(e.id)}" aria-label="Supprimer ce lien">×</button></li>`;}).join('');
+  P.innerHTML=`
+  <div>${n.kind!=='root'?`<span class="tag" style="border-color:${nodeColor(n)}">${esc(DOM[n.domain]?DOM[n.domain].name:'')}</span>`:''}<span class="tag">${KIND[n.kind]}</span>${n.pioneer?'<span class="tag">Pionnier</span>':''}${(n.rq||[]).map(r=>`<span class="tag">${r}</span>`).join('')}</div>
+  <h2>${esc(n.label)}</h2>
+  ${isP&&(n.authors||n.venue)?`<p style="color:var(--muted)">${esc([n.authors,n.venue,n.year].filter(Boolean).join(', '))}</p>`:''}
+  ${n.verify?'<p class="warn">Référence à vérifier : auteurs, année ou venue incertains.</p>':''}
+  ${n.url?`<p><a href="${esc(n.url)}" target="_blank" rel="noopener">Ouvrir l’article</a></p>`:''}
+  ${n.summary?`<h3>Résumé</h3><p id="vSum">${esc(n.summary)}</p>`:''}
+  ${n.rqNote?`<h3>Pour nos questions de recherche</h3><p id="vRq">${esc(n.rqNote)}</p>`:''}
+  <h3>Fiche</h3>
+  <div class="field"><label for="fLabel">${isP?'Titre':'Nom'}</label><input type="text" id="fLabel" data-f="label" value="${esc(n.label)}" ${ro}></div>
+  <div class="field"><label for="fShort">Libellé court dans le graphe</label><input type="text" id="fShort" data-f="short" value="${esc(n.short)}" ${ro}></div>
+  ${n.kind!=='root'?`<div class="row"><div class="field"><label for="fKind">Type</label><select id="fKind" data-f="kind" ${ro}>${opt({domain:'Domaine',axis:'Axe',paper:'Article'},n.kind)}</select></div>
+  <div class="field"><label for="fDom">Domaine</label><select id="fDom" data-f="domain" ${ro}>${opt({xai:'XAI',nlp:'NLP',dlg:'Dialogues formels'},n.domain)}</select></div></div>`:''}
+  ${isP?`<div class="field"><label for="fAuth">Auteurs</label><input type="text" id="fAuth" data-f="authors" value="${esc(n.authors)}" ${ro}></div>
+  <div class="row"><div class="field" style="flex:0 0 90px"><label for="fYear">Année</label><input type="text" id="fYear" data-f="year" value="${esc(n.year)}" ${ro}></div>
+  <div class="field"><label for="fVenue">Venue</label><input type="text" id="fVenue" data-f="venue" value="${esc(n.venue)}" ${ro}></div></div>
+  <div class="field"><label for="fUrl">Lien</label><input type="url" id="fUrl" data-f="url" value="${esc(n.url)}" placeholder="https://" ${ro}></div>
+  <div class="field"><label for="fStat">Statut de lecture</label><select id="fStat" data-f="status" ${ro}>${opt(STATUS,n.status)}</select></div>
+  <div class="field"><label>Questions de recherche</label><div class="checks">${Object.entries(RQ).map(([k,l])=>`<label title="${esc(l)}"><input type="checkbox" data-rq="${k}" ${(n.rq||[]).includes(k)?'checked':''} ${ro}> ${k}</label>`).join('')}</div></div>
+  <div class="field"><div class="checks"><label><input type="checkbox" data-f="pioneer" ${n.pioneer?'checked':''} ${ro}> Papier pionnier</label><label><input type="checkbox" data-f="verify" ${n.verify?'checked':''} ${ro}> À vérifier</label></div></div>`:''}
+  <div class="field"><label for="fSum">Résumé</label><textarea id="fSum" data-f="summary" ${ro}>${esc(n.summary||'')}</textarea></div>
+  <div class="field"><label for="fRqn">Utilité pour nos RQ</label><textarea id="fRqn" data-f="rqNote" ${ro}>${esc(n.rqNote||'')}</textarea></div>
+  <div class="field"><label for="fNote">Notes personnelles</label><textarea id="fNote" data-f="note" ${ro}>${esc(n.note)}</textarea></div>
+  <h3>Liens (${state.edges.filter(e=>e.source===n.id||e.target===n.id).length})</h3>
+  <ul class="conn">${conns||'<li style="color:var(--muted)">Aucun lien pour l’instant.</li>'}</ul>
+  <div class="actions editonly"><button class="btn" id="nLink" type="button">Lier à un autre nœud</button>${n.kind!=='paper'&&n.kind!=='root'?'<button class="btn" id="nChild" type="button">Ajouter un enfant</button>':''}${n.kind!=='root'?'<button class="btn danger" id="nDel" type="button">Supprimer le nœud</button>':''}</div>`;
+  P.querySelectorAll('[data-f]').forEach(el=>{
+    const ev=(el.tagName==='SELECT'||el.type==='checkbox')?'change':'input';
+    el.addEventListener(ev,()=>{const f=el.dataset.f;n[f]=el.type==='checkbox'?el.checked:el.value;
+      if(f==='label'&&!n._shortTouched&&n.kind!=='paper'){n.short=el.value;}
+      if(f==='short')n._shortTouched=true;
+      if(f==='summary'&&$('vSum'))$('vSum').textContent=el.value;
+      if(f==='rqNote'&&$('vRq'))$('vRq').textContent=el.value;
+      render();markDirty();if(ev==='change'&&(f==='kind'||f==='pioneer'||f==='verify'||f==='domain'))panel();});
+  });
+  P.querySelectorAll('[data-rq]').forEach(el=>el.addEventListener('change',()=>{const s=new Set(n.rq||[]);el.checked?s.add(el.dataset.rq):s.delete(el.dataset.rq);n.rq=Object.keys(RQ).filter(k=>s.has(k));render();markDirty();}));
+  P.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>select({type:'node',id:b.dataset.go}));
+  P.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{state.edges=state.edges.filter(e=>e.id!==b.dataset.del);render();panel();markDirty();});
+  if($('nLink'))$('nLink').onclick=()=>startLink(n.id);
+  if($('nChild'))$('nChild').onclick=()=>addNode(n);
+  if($('nDel'))$('nDel').onclick=()=>{
+    if(!pendingDel){pendingDel=true;$('nDel').textContent='Confirmer la suppression';return;}
+    state.nodes=state.nodes.filter(x=>x!==n);state.edges=state.edges.filter(e=>e.source!==n.id&&e.target!==n.id);select(null);render();markDirty();toast('Nœud supprimé');};
+}
+function helpHtml(){
+  return `<h2>Mode d’emploi</h2>
+  <p>Cliquez sur un nœud pour lire et modifier sa fiche. Faites glisser un nœud pour le déplacer, et le fond pour naviguer. Zoomez pour voir les titres des articles et les noms des relations.</p>
+  <p>Pour relier deux nœuds, utilisez « Lier deux nœuds », choisissez la relation, puis cliquez sur la source et sur la cible. Cliquez sur un lien pour changer sa relation, l’inverser ou le supprimer.</p>
+  ${STANDALONE?'<p>Vos changements sont gardés dans ce navigateur. « Exporter data.json » télécharge la carte : remplacez le fichier data.json du dépôt partagé pour que les autres voient vos changements.</p>':'<p>Vos changements sont gardés dans ce navigateur jusqu’à ce que vous cliquiez sur « Enregistrer ». L’enregistrement publie la carte pour toutes les personnes qui y ont accès.</p>'}
+  <h3>Questions de recherche</h3>
+  ${Object.entries(RQ).map(([k,l])=>`<p><strong>${k}</strong> : ${esc(l)}.</p>`).join('')}
+  <h3>Lecture du graphe</h3>
+  <p>Disque plein : article lu. Disque à moitié rempli : en cours. Cercle vide : à lire. Double anneau : papier pionnier. Contour pointillé : référence à vérifier. Flèche en tirets : relation entre articles (rouge si c’est une critique).</p>`;
+}
+function bindHelp(){}
+
+/* ---------- editing ---------- */
+function addNode(parent){
+  if(readOnly)return;
+  const s=sel&&sel.type==='node'?byId.get(sel.id):null;
+  const p=parent||(s&&s.kind!=='paper'?s:null);
+  const box=$('graph').getBoundingClientRect();const t=d3.zoomTransform($('graph'));
+  let x=(box.width/2-t.x)/t.k,y=(box.height/2-t.y)/t.k;
+  if(p){x=p.x+60+Math.random()*40;y=p.y+60+Math.random()*40;}
+  const kind=p?(p.kind==='root'?'domain':p.kind==='domain'?'axis':'paper'):'paper';
+  const dom=p&&p.domain!=='root'?p.domain:(s&&s.domain!=='root'?s.domain:'xai');
+  const n={id:uid('n'),kind,domain:dom,label:kind==='paper'?'Nouvel article':'Nouvel axe',short:kind==='paper'?'Nouveau':'Nouvel axe',authors:'',year:'',venue:'',status:'a_lire',pioneer:false,verify:false,rq:[],note:'',summary:'',rqNote:'',url:'',x:Math.round(x),y:Math.round(y)};
+  state.nodes.push(n);
+  if(p)state.edges.push({id:uid('e'),source:p.id,target:n.id,rel:'contient'});
+  render();select({type:'node',id:n.id});markDirty();
+  setTimeout(()=>{const f=$('fLabel');if(f){f.focus();f.select();}},30);
+}
+
+/* ---------- persistence ---------- */
+let draftT;
+function markDirty(){dirty=true;const b=$('btnSave');b.disabled=false;b.textContent=STANDALONE?'Exporter data.json':'Enregistrer';
+  clearTimeout(draftT);draftT=setTimeout(()=>{try{localStorage.setItem(DRAFT,JSON.stringify({base:state.savedAt,core:core()}));}catch(e){}},500);}
+function checkDraft(){
+  let d=null;try{d=JSON.parse(localStorage.getItem(DRAFT)||'null');}catch(e){}
+  if(!d||!d.core||d.core===core())return;
+  $('bannerText').textContent=d.base===state.savedAt?'Des modifications non enregistrées sont gardées dans ce navigateur.':'Un brouillon local existe, basé sur une version plus ancienne de la carte.';
+  $('banner').classList.add('show');
+  $('bannerRestore').onclick=()=>{const c=JSON.parse(d.core);state.nodes=c.nodes;state.edges=c.edges;$('banner').classList.remove('show');render();fit(true);markDirty();toast('Brouillon restauré');};
+  $('bannerDrop').onclick=()=>{try{localStorage.removeItem(DRAFT);}catch(e){}$('banner').classList.remove('show');};
+}
+function buildHtml(){
+  const css=$('app-style').textContent, js=APP_SRC;
+  const data=JSON.stringify(state).replace(/</g,'\\u003c');
+  return '<!doctype html>\n<html lang="fr">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n<title>Carte des lectures : explications adaptatives</title>\n'+
+  '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'+
+  '<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Literata:opsz,wght@7..72,500;7..72,600&display=swap" rel="stylesheet">\n'+
+  '<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"><'+'/script>\n'+
+  '<style id="app-style">'+css+'</style>\n</head>\n<body>\n'+
+  '<script type="application/json" id="graph-data">'+data+'<'+'/script>\n'+
+  '<script id="app">'+js+'<'+'/script>\n</body>\n</html>\n';
+}
+async function save(){
+  if(readOnly||!dirty)return;
+  const b=$('btnSave');const art=await artifactP;
+  if(!art){state.savedAt=new Date().toISOString();blobDownload('data.json',JSON.stringify(state,null,2));
+    try{localStorage.setItem(DRAFT,JSON.stringify({base:state.savedAt,core:core()}));}catch(e){}
+    dirty=false;b.disabled=true;b.textContent='Exporté';toast('data.json téléchargé : remplacez celui du dépôt partagé.');return;}
+  const prev=state.savedAt;state.savedAt=new Date().toISOString();
+  b.disabled=true;b.textContent='Enregistrement…';
+  try{await art.publish(buildHtml());dirty=false;b.textContent='Enregistré';try{localStorage.removeItem(DRAFT);}catch(e){}toast('Carte enregistrée');}
+  catch(e){state.savedAt=prev;const c=e&&e.code;
+    if(c==='conflict'){toast('Quelqu’un a enregistré entre-temps : la carte se recharge. Votre brouillon reste dans ce navigateur.');}
+    else if(c==='not_writer'||c==='not_granted'||c==='consent_required'||c==='capability_disabled'||c==='not_declared'){setReadOnly();toast('Cette vue est en lecture seule.');}
+    else if(c==='rate_limited'){b.disabled=false;b.textContent='Enregistrer';toast('Trop d’enregistrements rapprochés : réessayez dans un moment.');}
+    else if(c==='too_large'){b.disabled=false;b.textContent='Enregistrer';toast('La carte dépasse la taille maximale.');}
+    else{b.disabled=false;b.textContent='Enregistrer';toast('Échec de l’enregistrement. Vos changements restent dans ce navigateur.');}}
+}
+function setReadOnly(){readOnly=true;document.body.classList.add('ro');stopLink();panel();}
+
+/* ---------- export / import ---------- */
+function openData(){
+  $('dlgText').value=JSON.stringify({nodes:state.nodes,edges:state.edges},null,2);$('dlgText').readOnly=false;
+  $('dlg').showModal();
+  downloadsP.then(d=>{$('dlgDl').hidden=false;$('dlgDl').onclick=async()=>{if(!d){blobDownload('carte-lectures.json',$('dlgText').value);return;}try{await d.save({filename:'carte-lectures.json',data:$('dlgText').value});}catch(e){toast('Téléchargement annulé');}};});
+}
+
+/* ---------- toolbar ---------- */
+function initToolbar(){
+  const dc=$('domChips');
+  ['xai','nlp','dlg'].forEach(k=>{const b=document.createElement('button');b.type='button';b.className='chip';b.setAttribute('aria-pressed','true');
+    b.innerHTML=`<span class="dot" style="background:${DOM[k].c}"></span>${DOM[k].name}`;
+    b.onclick=()=>{F.doms.has(k)?F.doms.delete(k):F.doms.add(k);b.setAttribute('aria-pressed',F.doms.has(k));classes();};dc.appendChild(b);});
+  const rc=$('rqChips');
+  Object.entries(RQ).forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.title=l;b.setAttribute('aria-pressed','false');b.textContent=k;
+    b.onclick=()=>{F.rqs.has(k)?F.rqs.delete(k):F.rqs.add(k);b.setAttribute('aria-pressed',F.rqs.has(k));classes();};rc.appendChild(b);});
+  $('q').oninput=e=>{F.q=e.target.value.trim().toLowerCase();classes();};
+  $('fStatus').onchange=e=>{F.status=e.target.value;classes();};
+  $('fPio').onchange=e=>{F.pio=e.target.checked;classes();};
+  $('fVer').onchange=e=>{F.ver=e.target.checked;classes();};
+  $('linkRel').innerHTML=opt(REL,'utilise');
+  $('btnLink').onclick=()=>linkMode?stopLink():startLink(sel&&sel.type==='node'?sel.id:null);
+  $('linkCancel').onclick=stopLink;
+  $('btnAdd').onclick=()=>addNode(null);
+  $('btnSave').onclick=save;
+  $('btnData').onclick=openData;
+  $('dlgClose').onclick=()=>$('dlg').close();
+  $('dlgCopy').onclick=async()=>{const t=$('dlgText');t.select();try{await navigator.clipboard.writeText(t.value);toast('JSON copié');}catch(e){toast('Sélectionné : copiez avec Ctrl+C ou Cmd+C');}};
+  $('dlgImport').onclick=()=>{try{const c=JSON.parse($('dlgText').value);if(!Array.isArray(c.nodes)||!Array.isArray(c.edges))throw 0;
+      state.nodes=c.nodes;state.edges=c.edges;if(state.nodes.some(n=>n.x==null))seedLayout();$('dlg').close();select(null);render();fit(true);markDirty();toast('Carte remplacée');}
+    catch(e){toast('Ce JSON ne contient pas de listes « nodes » et « edges » valides.');}};
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(linkMode)stopLink();else if(sel)select(null);}});
+  $('legend').innerHTML=`
+   <svg width="18" height="18"><circle cx="9" cy="9" r="6" fill="var(--xai)" stroke="var(--xai)" stroke-width="2"/></svg><span>Lu</span>
+   <svg width="18" height="18"><circle cx="9" cy="9" r="6" fill="url(#half-xai)" stroke="var(--xai)" stroke-width="2"/></svg><span>En cours</span>
+   <svg width="18" height="18"><circle cx="9" cy="9" r="6" fill="var(--surface)" stroke="var(--xai)" stroke-width="2"/></svg><span>À lire</span>
+   <svg width="18" height="18"><circle cx="9" cy="9" r="5" fill="var(--surface)" stroke="var(--xai)" stroke-width="2"/><circle cx="9" cy="9" r="8" fill="none" stroke="var(--xai)" stroke-width="1.3"/></svg><span>Pionnier</span>
+   <svg width="18" height="18"><circle cx="9" cy="9" r="6" fill="var(--surface)" stroke="var(--xai)" stroke-width="2" stroke-dasharray="3 2"/></svg><span>À vérifier</span>`;
+}
+
+/* ---------- boot ---------- */
+function boot(){
+  if(typeof d3==='undefined'){$('panel').innerHTML='<h2>Chargement impossible</h2><p>La bibliothèque de dessin du graphe n’a pas pu être chargée. Rechargez la page.</p>';return;}
+  initToolbar();initSvg();ensureHalfPatterns();
+  start();
+}
+async function start(){
+  if(STANDALONE&&/^https?:/.test(location.protocol)){
+    try{const r=await fetch('data.json',{cache:'no-store'});if(r.ok){const d=await r.json();if(Array.isArray(d.nodes)&&Array.isArray(d.edges))state=d;}}catch(e){}
+  }
+  if(state.nodes.some(n=>n.x==null))seedLayout();
+  render();panel();requestAnimationFrame(()=>fit(false));checkDraft();
+}
+boot();
+})();
+</script>
+</body>
+</html>

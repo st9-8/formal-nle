@@ -1,0 +1,2532 @@
+{
+  "version": 1,
+  "savedAt": "2026-10-26T12:00:00Z",
+  "nodes": [
+    {
+      "id": "root",
+      "kind": "root",
+      "domain": "root",
+      "label": "Explications adaptatives en langage naturel",
+      "short": "Explications adaptatives",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "Comprendre ce que l’utilisateur veut savoir, décider quoi expliquer ensuite, adapter fidèlement l’explication au fil du dialogue.",
+      "url": "",
+      "summary": "Programme de recherche : aider un utilisateur à explorer un modèle boîte noire par un dialogue qui évolue. Le système comprend le besoin, calcule les explications pertinentes et adapte leur communication.",
+      "rqNote": "RQ1 : que retenir de l’utilisateur et du dialogue. RQ2 : décider quand clarifier et quelle méthode utiliser. RQ3 : adapter le contenu et la formulation sans affirmations non étayées."
+    },
+    {
+      "id": "xai",
+      "kind": "domain",
+      "domain": "xai",
+      "label": "XAI",
+      "short": "XAI",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "Méthodes d’explication, besoins humains, évaluation.",
+      "url": "",
+      "summary": "Méthodes pour rendre compréhensibles les décisions des modèles, et études de ce dont les humains ont réellement besoin.",
+      "rqNote": "Fournit le moteur « Investigate » (RQ2) et les critères d’évaluation de la compréhension (RQ3)."
+    },
+    {
+      "id": "nlp",
+      "kind": "domain",
+      "domain": "nlp",
+      "label": "NLP",
+      "short": "NLP",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "Génération d’explications en langue naturelle et fidélité des LLM.",
+      "url": "",
+      "summary": "Génération et évaluation d’explications en langue naturelle, et fidélité des explications produites par les LLM.",
+      "rqNote": "Couvre l’étape « Communicate » et le risque principal de RQ3 : un texte plausible mais infidèle."
+    },
+    {
+      "id": "dlg",
+      "kind": "domain",
+      "domain": "dlg",
+      "label": "Dialogues formels",
+      "short": "Dialogues formels",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "Modéliser l’interlocuteur et planifier le dialogue de façon contrôlable.",
+      "url": "",
+      "summary": "Modèles formels du dialogue et de l’argumentation : actes de dialogue, protocoles, représentation quantitative des états de l’interlocuteur.",
+      "rqNote": "Apporte un modèle utilisateur contrôlable et vérifiable (RQ1) et une planification explicite des tours (RQ2)."
+    },
+    {
+      "id": "x1",
+      "kind": "axis",
+      "domain": "xai",
+      "label": "Fondements et définitions",
+      "short": "Fondements et définitions",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Ce qu’on entend par interprétabilité et explication.",
+      "rqNote": "Sert à définir précisément les termes de vos RQ."
+    },
+    {
+      "id": "lipton",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "The Mythos of Model Interpretability",
+      "short": "Mythos",
+      "authors": "Z. C. Lipton",
+      "year": "2016",
+      "venue": "ICML WHI (puis ACM Queue 2018)",
+      "status": "a_lire",
+      "pioneer": true,
+      "verify": false,
+      "rq": [],
+      "note": "Montre que « interprétabilité » recouvre des notions différentes.",
+      "url": "",
+      "summary": "Montre que l’interprétabilité recouvre des objectifs différents (confiance, causalité, transférabilité, information, équité) et distingue transparence du modèle et explications post-hoc. Met en garde contre des explications post-hoc séduisantes mais trompeuses.",
+      "rqNote": "Aide à expliciter l’objectif de l’utilisateur derrière une question (RQ1) et fonde la vigilance sur les explications post-hoc générées (RQ3)."
+    },
+    {
+      "id": "doshi",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Towards a Rigorous Science of Interpretable Machine Learning",
+      "short": "Rigorous science",
+      "authors": "F. Doshi-Velez, B. Kim",
+      "year": "2017",
+      "venue": "arXiv",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "Taxonomie de l’évaluation : application, humain, fonctionnelle.",
+      "url": "",
+      "summary": "Propose une définition de l’interprétabilité et trois niveaux d’évaluation : ancrée dans l’application (vrais utilisateurs, vraie tâche), ancrée dans l’humain (tâches simplifiées) et fonctionnelle (proxys sans humain).",
+      "rqNote": "Cadre le protocole pour « démontrer que l’utilisateur comprend mieux » : choisir le niveau d’évaluation et l’assumer."
+    },
+    {
+      "id": "miller",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Explanation in Artificial Intelligence: Insights from the Social Sciences",
+      "short": "Miller",
+      "authors": "T. Miller",
+      "year": "2019",
+      "venue": "Artificial Intelligence",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ1"
+      ],
+      "note": "Explications contrastives, sélectives et sociales. Cité dans votre présentation.",
+      "url": "",
+      "summary": "Synthèse des sciences sociales sur l’explication : les explications sont contrastives (pourquoi P plutôt que Q), sélectives (quelques causes), moins probabilistes que causales, et sociales, donc conversationnelles.",
+      "rqNote": "Donne une théorie pour typer les besoins (questions contrastives, sélection des causes) en RQ1 et justifie le format dialogique de RQ2."
+    },
+    {
+      "id": "x2",
+      "kind": "axis",
+      "domain": "xai",
+      "label": "Attribution post-hoc",
+      "short": "Attribution post-hoc",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Méthodes qui attribuent à chaque variable une part de la prédiction.",
+      "rqNote": "Opérations de base du module « Investigate » (RQ2)."
+    },
+    {
+      "id": "lime",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "“Why Should I Trust You?” Explaining the Predictions of Any Classifier",
+      "short": "LIME",
+      "authors": "M. T. Ribeiro, S. Singh, C. Guestrin",
+      "year": "2016",
+      "venue": "KDD",
+      "status": "a_lire",
+      "pioneer": true,
+      "verify": false,
+      "rq": [
+        "RQ2"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Explique une prédiction en ajustant localement un modèle linéaire simple sur des perturbations de l’instance. Agnostique au modèle. Propose aussi SP-LIME pour choisir des exemples représentatifs.",
+      "rqNote": "Opération candidate pour « quels facteurs ? » (RQ2). Instabilité et coût en appels connus, à surveiller pour la fidélité (RQ3)."
+    },
+    {
+      "id": "shap",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "A Unified Approach to Interpreting Model Predictions",
+      "short": "SHAP",
+      "authors": "S. Lundberg, S.-I. Lee",
+      "year": "2017",
+      "venue": "NeurIPS",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ2"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Unifie plusieurs méthodes d’attribution sous les valeurs de Shapley, avec des garanties axiomatiques (efficience, symétrie, nullité). Propose KernelSHAP, agnostique au modèle.",
+      "rqNote": "Opération de référence (RQ2) ; c’est l’entrée de XAIStories et de TalkToModel, donc le point de comparaison naturel."
+    },
+    {
+      "id": "ig",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Axiomatic Attribution for Deep Networks",
+      "short": "Integrated Gradients",
+      "authors": "M. Sundararajan, A. Taly, Q. Yan",
+      "year": "2017",
+      "venue": "ICML",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ2"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Attribution pour modèles différentiables : intègre les gradients le long d’un chemin entre une baseline et l’entrée. Satisfait les axiomes de sensibilité et d’invariance à l’implémentation.",
+      "rqNote": "Pertinent si la boîte noire est un réseau de neurones ou un LLM. SR-NLE l’utilise comme feedback pour rendre les NLE plus fidèles (RQ3)."
+    },
+    {
+      "id": "anchors",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Anchors: High-Precision Model-Agnostic Explanations",
+      "short": "Anchors",
+      "authors": "M. T. Ribeiro, S. Singh, C. Guestrin",
+      "year": "2018",
+      "venue": "AAAI",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ2"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Produit des règles « si… alors… » de haute précision qui suffisent localement à fixer la prédiction, avec une mesure de couverture.",
+      "rqNote": "Les règles se traduisent facilement en langue naturelle, ce qui convient aux non-experts (RQ3). Baseline de MaNtLE."
+    },
+    {
+      "id": "x3",
+      "kind": "axis",
+      "domain": "xai",
+      "label": "Contrefactuels et recours",
+      "short": "Contrefactuels et recours",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Explications par changements minimaux qui modifient la décision.",
+      "rqNote": "Répondent à « que faudrait-il changer ? » et au recours (RQ2, RQ3)."
+    },
+    {
+      "id": "wachter",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Counterfactual Explanations without Opening the Black Box",
+      "short": "Wachter",
+      "authors": "S. Wachter, B. Mittelstadt, C. Russell",
+      "year": "2017",
+      "venue": "Harvard Journal of Law & Technology",
+      "status": "a_lire",
+      "pioneer": true,
+      "verify": false,
+      "rq": [
+        "RQ2"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Définit l’explication contrefactuelle comme le plus petit changement de l’entrée qui modifie la décision, sans ouvrir la boîte noire. Argumentation juridique liée au RGPD.",
+      "rqNote": "Répond à « que faudrait-il changer ? » (RQ2) et rejoint l’argument légal de votre slide 5."
+    },
+    {
+      "id": "dice",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Explaining ML Classifiers through Diverse Counterfactual Explanations",
+      "short": "DiCE",
+      "authors": "R. K. Mothilal, A. Sharma, C. Tan",
+      "year": "2020",
+      "venue": "FAT* / FAccT",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ2"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Génère plusieurs contrefactuels diversifiés et réalisables, par optimisation avec termes de proximité et de diversité, et contraintes sur les variables modifiables. Bibliothèque disponible.",
+      "rqNote": "Outil prêt à l’emploi. La diversité permet de proposer une autre option quand l’utilisateur rejette une suggestion (RQ2)."
+    },
+    {
+      "id": "karimi",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Algorithmic Recourse: from Counterfactual Explanations to Interventions",
+      "short": "Recours algorithmique",
+      "authors": "A.-H. Karimi, B. Schölkopf, I. Valera",
+      "year": "2021",
+      "venue": "FAccT",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ2",
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Montre que des contrefactuels qui ignorent la causalité peuvent donner des recommandations inefficaces, et reformule le recours comme des interventions sur un modèle causal.",
+      "rqNote": "Une explication « actionnable » doit respecter les dépendances causales : critère de fidélité du contenu (RQ3)."
+    },
+    {
+      "id": "naturalxai",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Natural XAI: Feasible, Actionable, and Causally-Aware Counterfactual Explanations in Natural Language",
+      "short": "Natural XAI",
+      "authors": "",
+      "year": "2025",
+      "venue": "",
+      "status": "lu",
+      "pioneer": false,
+      "verify": true,
+      "rq": [
+        "RQ2",
+        "RQ3"
+      ],
+      "note": "Taxonomie d’actionnabilité (FAT), graphe causal (DECI), NLG à base de templates, raffinement itératif avec l’utilisateur.",
+      "url": "",
+      "summary": "Intègre une taxonomie d’actionnabilité des variables (FAT) et la découverte causale (DECI) dans la génération de contrefactuels, présentés en langue naturelle par templates. Un workflow agentique laisse l’utilisateur affiner les contraintes.",
+      "rqNote": "Les contraintes données par l’utilisateur forment un modèle de l’utilisateur (RQ1). Exemple de NLG contrôlée qui limite les affirmations non étayées (RQ3)."
+    },
+    {
+      "id": "x4",
+      "kind": "axis",
+      "domain": "xai",
+      "label": "Explications par concepts",
+      "short": "Explications par concepts",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Explications en termes de concepts humains plutôt que de variables brutes.",
+      "rqNote": "Utile pour la question « quels concepts comptent ? » de votre slide 6."
+    },
+    {
+      "id": "tcav",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Interpretability Beyond Feature Attribution: Testing with Concept Activation Vectors",
+      "short": "TCAV",
+      "authors": "B. Kim et al.",
+      "year": "2018",
+      "venue": "ICML",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ2"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Mesure la sensibilité d’un modèle à un concept humain, défini par des exemples, grâce à des vecteurs d’activation de concept.",
+      "rqNote": "Piste pour « quels concepts comptent ? ». Moins directe pour des données tabulaires."
+    },
+    {
+      "id": "x5",
+      "kind": "axis",
+      "domain": "xai",
+      "label": "XAI centrée humain et besoins",
+      "short": "XAI centrée humain et besoins",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Études empiriques sur les besoins, l’usage et les effets des explications chez les humains.",
+      "rqNote": "Base pour représenter les besoins (RQ1) et pour l’évaluation."
+    },
+    {
+      "id": "liao",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Questioning the AI: Informing Design Practices for Explainable AI User Experiences",
+      "short": "XAI Question Bank",
+      "authors": "Q. V. Liao, D. Gruen, S. Miller",
+      "year": "2020",
+      "venue": "CHI",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ1"
+      ],
+      "note": "Typologie des questions des utilisateurs. Base possible pour représenter les besoins explicatifs.",
+      "url": "",
+      "summary": "Entretiens avec des praticiens UX. Propose la XAI Question Bank, qui organise les besoins en catégories de questions (how, why, why not, what if, how to be that, data, performance…) reliées à des méthodes XAI.",
+      "rqNote": "Candidat fort pour représenter les besoins explicatifs (RQ1) et pour la correspondance question → méthode (RQ2)."
+    },
+    {
+      "id": "kaur",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Interpreting Interpretability: Understanding Data Scientists’ Use of Interpretability Tools",
+      "short": "Kaur",
+      "authors": "H. Kaur et al.",
+      "year": "2020",
+      "venue": "CHI",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ1"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Étude auprès de data scientists : ils font trop confiance à des outils comme SHAP et les interprètent souvent mal.",
+      "rqNote": "Justifie l’adaptation même pour des experts (votre slide 7) et le besoin de vérifier la compréhension réelle."
+    },
+    {
+      "id": "alufaisan",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Does Explainable AI Improve Human Decision-Making?",
+      "short": "Alufaisan",
+      "authors": "Y. Alufaisan et al.",
+      "year": "2021",
+      "venue": "AAAI",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Expériences montrant que fournir des explications n’améliore pas forcément la qualité des décisions humaines par rapport à la prédiction seule.",
+      "rqNote": "Argument pour mesurer la compréhension objective, pas seulement la satisfaction."
+    },
+    {
+      "id": "bucinca",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "To Trust or to Think: Cognitive Forcing Functions Can Reduce Overreliance on AI",
+      "short": "Cognitive forcing",
+      "authors": "Z. Buçinca, M. B. Malaya, K. Z. Gajos",
+      "year": "2021",
+      "venue": "CSCW",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ1"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Les explications peuvent accroître la sur-confiance. Des « fonctions de forçage cognitif » (faire réfléchir l’humain avant de montrer l’IA) la réduisent, au prix d’une expérience jugée moins agréable.",
+      "rqNote": "Éclaire le compromis préférence/performance. La stratégie d’explication peut inclure des questions posées à l’utilisateur (RQ2)."
+    },
+    {
+      "id": "prefperf",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Towards Balancing Preference and Performance through Adaptive Personalized Explainability",
+      "short": "Préférence vs performance",
+      "authors": "",
+      "year": "2024",
+      "venue": "HRI",
+      "status": "lu",
+      "pioneer": false,
+      "verify": true,
+      "rq": [
+        "RQ1",
+        "RQ2"
+      ],
+      "note": "Pondération λ entre préférence et performance, adaptée à chaque décision.",
+      "url": "",
+      "summary": "Dans un simulateur de conduite où l’IA se trompe 30 % du temps, compare langue naturelle, cartes d’importance et arbres de décision. Adapte la modalité avec un poids λ entre préférence et performance, prédit à chaque décision.",
+      "rqNote": "Idée transposable : arbitrer dynamiquement entre ce que l’utilisateur préfère et ce qui l’aide vraiment (RQ2)."
+    },
+    {
+      "id": "x6",
+      "kind": "axis",
+      "domain": "xai",
+      "label": "XAI conversationnelle",
+      "short": "XAI conversationnelle",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Systèmes où l’explication passe par un dialogue en langage naturel.",
+      "rqNote": "Le cœur de votre état de l’art : situer votre contribution par rapport à ces systèmes."
+    },
+    {
+      "id": "sokol",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Conversational Explanations of ML Predictions Through Class-contrastive Counterfactual Statements",
+      "short": "Sokol & Flach",
+      "authors": "K. Sokol, P. Flach",
+      "year": "2018",
+      "venue": "IJCAI",
+      "status": "a_lire",
+      "pioneer": true,
+      "verify": false,
+      "rq": [
+        "RQ2"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Démonstrateur d’explications conversationnelles : l’utilisateur pose des questions et reçoit des contrefactuels contrastifs, en précisant ses contraintes.",
+      "rqNote": "Ancêtre direct de votre vision : le dialogue comme interface d’explication (RQ2)."
+    },
+    {
+      "id": "rohlfing",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Explanation as a Social Practice: Toward a Conceptual Framework for the Social Design of AI Systems",
+      "short": "Co-construction",
+      "authors": "K. J. Rohlfing et al.",
+      "year": "2021",
+      "venue": "IEEE TCDS",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ1"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Cadre conceptuel où l’explication est une pratique sociale co-construite entre explainer et explainee, avec un niveau micro (le dialogue) et un niveau macro (rôles, modèle du partenaire).",
+      "rqNote": "Fondement du « modèle du partenaire » à maintenir (RQ1). CoCoXplain et l’étude des LLM co-constructifs s’en réclament."
+    },
+    {
+      "id": "lakkaraju",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Rethinking Explainability as a Dialogue: A Practitioner’s Perspective",
+      "short": "Explainability as dialogue",
+      "authors": "H. Lakkaraju et al.",
+      "year": "2022",
+      "venue": "arXiv",
+      "status": "lu",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ1"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Entretiens avec des médecins, des professionnels et des décideurs : ils veulent interroger les modèles en langage naturel, comme un collègue. Propose cinq principes pour concevoir des explications interactives.",
+      "rqNote": "Les cinq principes peuvent servir d’exigences de conception et de grille d’évaluation."
+    },
+    {
+      "id": "ttm",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Explaining Machine Learning Models with Interactive Natural Language Conversations Using TalkToModel",
+      "short": "TalkToModel",
+      "authors": "D. Slack et al.",
+      "year": "2023",
+      "venue": "Nature Machine Intelligence",
+      "status": "lu",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ2"
+      ],
+      "note": "Parsing vers une grammaire exécutable, positionné après l’entraînement.",
+      "url": "",
+      "summary": "Traduit les questions de l’utilisateur en une grammaire exécutable via un LLM fine-tuné, exécute les opérations XAI et répond en langage naturel. Pour classifieurs tabulaires.",
+      "rqNote": "Baseline principale pour « Interpréter → Exécuter → Répondre ». Ne modélise pas l’utilisateur (manque RQ1)."
+    },
+    {
+      "id": "interrolang",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "InterroLang: Exploring NLP Models and Datasets through Dialogue-based Explanations",
+      "short": "InterroLang",
+      "authors": "N. Feldhus et al.",
+      "year": "2023",
+      "venue": "Findings of EMNLP",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ2"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Transpose l’approche TalkToModel aux modèles de NLP (classification de texte), avec attribution, contrefactuels et rationales, et une étude utilisateur.",
+      "rqNote": "Montre l’extension à un autre type de données : utile pour décider du périmètre."
+    },
+    {
+      "id": "convxai",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "ConvXAI: Delivering Heterogeneous AI Explanations via Conversations",
+      "short": "ConvXAI",
+      "authors": "H. Shen et al.",
+      "year": "2023",
+      "venue": "CSCW Companion",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ2"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Système conversationnel qui combine plusieurs types d’explications pour l’aide à la rédaction scientifique ; étudie des besoins variés selon les utilisateurs.",
+      "rqNote": "Illustre le choix de la méthode selon la question et l’utilisateur (RQ2)."
+    },
+    {
+      "id": "llmcheckup",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "LLMCheckup: Conversational Examination of LLMs via Interpretability Tools and Self-Explanations",
+      "short": "LLMCheckup",
+      "authors": "Q. Wang et al.",
+      "year": "2024",
+      "venue": "HCI+NLP Workshop",
+      "status": "lu",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ2"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Un seul LLM interprète la requête, exécute la tâche, produit des self-explanations et appelle des outils d’interprétabilité, sans fine-tuning. Parsing par décodage guidé ou multi-prompt.",
+      "rqNote": "Montre qu’un LLM unique suffit pour interpréter les questions. Non adaptatif."
+    },
+    {
+      "id": "xaistories",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Tell Me a Story! Narrative-Driven XAI with Large Language Models",
+      "short": "XAIStories",
+      "authors": "D. Martens et al.",
+      "year": "2025",
+      "venue": "Decision Support Systems",
+      "status": "lu",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Utilise un LLM pour transformer des valeurs SHAP et des contrefactuels en récits. Les études utilisateurs rapportent une meilleure compréhension perçue.",
+      "rqNote": "Modèle de l’étape « Communicate ». Pas de dialogue ni d’adaptation, et la fidélité des récits reste à garantir (RQ3)."
+    },
+    {
+      "id": "cocoxplain",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Towards Co-Constructed Explanations: A Multi-Agent Reasoning-Based Conversational System for Adaptive Explanations",
+      "short": "CoCoXplain",
+      "authors": "D. Mindlin et al.",
+      "year": "2025",
+      "venue": "HAI",
+      "status": "lu",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ1",
+        "RQ2"
+      ],
+      "note": "Boucle MAPE-K. Explications précalculées : pas de construction dynamique.",
+      "url": "",
+      "summary": "Boucle MAPE-K avec agents LLM : suit l’engagement (ICAP) et les signaux de compréhension, maintient un modèle utilisateur et planifie le tour suivant. Compréhension perçue meilleure, compréhension objective non.",
+      "rqNote": "Référence la plus proche de RQ1. Sa limite (explications précalculées) est votre ouverture pour RQ2."
+    },
+    {
+      "id": "x7",
+      "kind": "axis",
+      "domain": "xai",
+      "label": "Évaluation et fidélité",
+      "short": "Évaluation et fidélité",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Comment mesurer la fidélité et l’utilité des explications.",
+      "rqNote": "Transversal : la question « comment démontrer que l’utilisateur comprend mieux ? »."
+    },
+    {
+      "id": "hoffman",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Metrics for Explainable AI: Challenges and Prospects",
+      "short": "Metrics for XAI",
+      "authors": "R. R. Hoffman et al.",
+      "year": "2018",
+      "venue": "arXiv",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Propose des mesures pour évaluer l’XAI : qualité de l’explication, satisfaction, modèle mental de l’utilisateur, curiosité, confiance, performance de la tâche.",
+      "rqNote": "Boîte à outils pour mesurer le modèle mental de l’utilisateur, au-delà de la satisfaction."
+    },
+    {
+      "id": "jacovi",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Towards Faithfully Interpretable NLP Systems",
+      "short": "Jacovi & Goldberg",
+      "authors": "A. Jacovi, Y. Goldberg",
+      "year": "2020",
+      "venue": "ACL",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Clarifie la fidélité : distincte de la plausibilité, graduelle plutôt que binaire. Donne des lignes directrices pour l’évaluer.",
+      "rqNote": "Vocabulaire de base pour formuler RQ3."
+    },
+    {
+      "id": "hase",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "Evaluating Explainable AI: Which Algorithmic Explanations Help Users Predict Model Behavior?",
+      "short": "Simulatabilité",
+      "authors": "P. Hase, M. Bansal",
+      "year": "2020",
+      "venue": "ACL",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Mesure la simulatabilité (l’utilisateur prédit-il le modèle ?) avant et après des explications LIME, Anchors, prototypes, etc. Peu de méthodes aident nettement.",
+      "rqNote": "Protocole réutilisable pour l’évaluation objective, repris par MaNtLE."
+    },
+    {
+      "id": "nauta",
+      "kind": "paper",
+      "domain": "xai",
+      "label": "From Anecdotal Evidence to Quantitative Evaluation Methods: A Systematic Review on Evaluating XAI",
+      "short": "Co-12",
+      "authors": "M. Nauta et al.",
+      "year": "2023",
+      "venue": "ACM Computing Surveys",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Revue systématique de l’évaluation XAI. Propose 12 propriétés (Co-12) : exactitude, complétude, cohérence, compacité, contrastivité, etc.",
+      "rqNote": "Grille pour choisir les critères d’évaluation de votre système."
+    },
+    {
+      "id": "n1",
+      "kind": "axis",
+      "domain": "nlp",
+      "label": "Fondations des modèles",
+      "short": "Fondations des modèles",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Architectures et techniques de base des modèles de langue.",
+      "rqNote": "Contexte technique, utile si vous entraînez un modèle explicatif dédié."
+    },
+    {
+      "id": "transformer",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Attention Is All You Need",
+      "short": "Transformer",
+      "authors": "A. Vaswani et al.",
+      "year": "2017",
+      "venue": "NeurIPS",
+      "status": "a_lire",
+      "pioneer": true,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Architecture fondée uniquement sur l’attention, sans récurrence, base de tous les LLM actuels.",
+      "rqNote": "Contexte technique."
+    },
+    {
+      "id": "t5",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+      "short": "T5",
+      "authors": "C. Raffel et al.",
+      "year": "2020",
+      "venue": "JMLR",
+      "status": "lu",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Formule toutes les tâches de NLP en texte → texte avec un préfixe de tâche, et compare systématiquement les choix de pré-entraînement. Introduit le corpus C4.",
+      "rqNote": "Base de MaNtLE. Utile si vous entraînez un petit modèle explicatif."
+    },
+    {
+      "id": "distill",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Distilling the Knowledge in a Neural Network",
+      "short": "Distillation",
+      "authors": "G. Hinton, O. Vinyals, J. Dean",
+      "year": "2015",
+      "venue": "NIPS Deep Learning Workshop",
+      "status": "lu",
+      "pioneer": true,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Entraîne un petit modèle (student) à reproduire les probabilités adoucies d’un gros modèle (teacher).",
+      "rqNote": "Piste pour déployer un module explicatif léger."
+    },
+    {
+      "id": "n2",
+      "kind": "axis",
+      "domain": "nlp",
+      "label": "Explications en langue naturelle (NLE)",
+      "short": "Explications en langue naturelle (NLE)",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Datasets et modèles qui produisent des justifications textuelles.",
+      "rqNote": "Montre les formats d’explication textuelle et leurs limites (RQ3)."
+    },
+    {
+      "id": "esnli",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "e-SNLI: Natural Language Inference with Natural Language Explanations",
+      "short": "e-SNLI",
+      "authors": "O.-M. Camburu et al.",
+      "year": "2018",
+      "venue": "NeurIPS",
+      "status": "lu",
+      "pioneer": true,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Ajoute des explications humaines à SNLI et entraîne des modèles « prédire puis expliquer » et « expliquer puis prédire ». Les explications générées restent de qualité moyenne et transfèrent mal.",
+      "rqNote": "Pionnier des NLE supervisées. Montre la difficulté d’obtenir des explications de bonne qualité par simple entraînement."
+    },
+    {
+      "id": "cose",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Explain Yourself! Leveraging Language Models for Commonsense Reasoning",
+      "short": "CoS-E",
+      "authors": "N. F. Rajani et al.",
+      "year": "2019",
+      "venue": "ACL",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Collecte des explications humaines pour CommonsenseQA. Le modèle CAGE génère une explication puis s’en sert pour répondre, ce qui améliore la précision.",
+      "rqNote": "Exemple d’explication utilisée comme raisonnement ; sa fidélité a ensuite été discutée."
+    },
+    {
+      "id": "makeup",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Make Up Your Mind! Adversarial Generation of Inconsistent Natural Language Explanations",
+      "short": "Make Up Your Mind!",
+      "authors": "O.-M. Camburu et al.",
+      "year": "2020",
+      "venue": "ACL",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Attaque adverse montrant que des modèles NLE peuvent produire des explications incohérentes entre elles pour des entrées voisines.",
+      "rqNote": "Test de cohérence à intégrer à la vérification (RQ3)."
+    },
+    {
+      "id": "teachme",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Teach Me to Explain: A Review of Datasets for Explainable NLP",
+      "short": "Teach Me to Explain",
+      "authors": "S. Wiegreffe, A. Marasović",
+      "year": "2021",
+      "venue": "NeurIPS Datasets & Benchmarks",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Revue des datasets d’explications en NLP. Distingue surlignages, explications libres et explications structurées.",
+      "rqNote": "Vocabulaire des formats d’explication, pour choisir le format de sortie."
+    },
+    {
+      "id": "mariotti",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Towards Harnessing Natural Language Generation to Explain Black-box Models",
+      "short": "Mariotti",
+      "authors": "E. Mariotti et al.",
+      "year": "2020",
+      "venue": "NL4XAI Workshop",
+      "status": "lu",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Panorama des approches de génération d’explications textuelles (templates, génération de bout en bout) et des problèmes d’évaluation. Défend le dialogue explicatif.",
+      "rqNote": "Montre la limite des templates et l’absence de métriques consensuelles (RQ3)."
+    },
+    {
+      "id": "cambria",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "A Survey on XAI and Natural Language Explanations",
+      "short": "Survey NLE",
+      "authors": "E. Cambria et al.",
+      "year": "2023",
+      "venue": "Information Processing & Management",
+      "status": "lu",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ1",
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Survey de 70 travaux d’XAI avec explications en langue naturelle, organisé en feuille de route : contexte, génération de l’explication, génération du message.",
+      "rqNote": "Sa feuille de route recoupe votre pipeline ; utile pour structurer la section Related Work."
+    },
+    {
+      "id": "mantle",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "MaNtLE: Model-agnostic Natural Language Explainer",
+      "short": "MaNtLE",
+      "authors": "R. R. Menon et al.",
+      "year": "2023",
+      "venue": "EMNLP",
+      "status": "lu",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "Règles en langue naturelle à partir de 10 à 12 exemples. Plus fidèle que LIME à budget d’appels limité.",
+      "url": "",
+      "summary": "Modèle T5 entraîné sur 200 000 tâches synthétiques pour énoncer une règle en langue naturelle à partir de 10 à 12 exemples étiquetés par un classifieur. Plus fidèle que LIME à budget d’appels limité, et aide les utilisateurs à prédire le modèle.",
+      "rqNote": "Alternative aux attributions pour des explications de groupe (RQ2). Ses difficultés avec les conjonctions et négations limitent la fidélité (RQ3)."
+    },
+    {
+      "id": "situated",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Situated Natural Language Explanations",
+      "short": "Situated NLE",
+      "authors": "",
+      "year": "2024",
+      "venue": "ACL",
+      "status": "lu",
+      "pioneer": false,
+      "verify": true,
+      "rq": [
+        "RQ1",
+        "RQ3"
+      ],
+      "note": "Prompts « busy » / « detailed » : adapter l’explication à l’audience.",
+      "url": "",
+      "summary": "Les explications doivent être adaptées à l’audience. Compare des prompts « busy » et « detailed » et mesure longueur, diversité, concrétude, persuasion. Les grands modèles s’adaptent mieux.",
+      "rqNote": "Moyen léger d’adapter la forme (RQ3) ; ne traite pas la fidélité."
+    },
+    {
+      "id": "n3",
+      "kind": "axis",
+      "domain": "nlp",
+      "label": "Fidélité des explications de LLM",
+      "short": "Fidélité des explications de LLM",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Les explications produites par les LLM reflètent-elles leur vrai raisonnement ?",
+      "rqNote": "Raison principale d’ancrer les réponses sur des preuves calculées (RQ3)."
+    },
+    {
+      "id": "cot",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
+      "short": "Chain-of-Thought",
+      "authors": "J. Wei et al.",
+      "year": "2022",
+      "venue": "NeurIPS",
+      "status": "a_lire",
+      "pioneer": true,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Montre que demander des étapes de raisonnement intermédiaires améliore fortement les performances des grands modèles sur des tâches de raisonnement.",
+      "rqNote": "Point de départ des débats sur la fidélité des explications des LLM (RQ3)."
+    },
+    {
+      "id": "turpin",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Language Models Don’t Always Say What They Think: Unfaithful Explanations in CoT Prompting",
+      "short": "Turpin",
+      "authors": "M. Turpin et al.",
+      "year": "2023",
+      "venue": "NeurIPS",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Montre que des explications chain-of-thought rationalisent des réponses influencées par des biais (par exemple l’ordre des options) sans jamais mentionner ces biais.",
+      "rqNote": "Raison de ne pas se fier aux self-explanations du LLM et d’ancrer les réponses sur des preuves calculées (RQ3)."
+    },
+    {
+      "id": "atanasova",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Faithfulness Tests for Natural Language Explanations",
+      "short": "Tests de fidélité",
+      "authors": "P. Atanasova et al.",
+      "year": "2023",
+      "venue": "ACL",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "Test contrefactuel repris par SR-NLE.",
+      "url": "",
+      "summary": "Propose deux tests de fidélité des NLE : un test contrefactuel (insérer des mots qui changent la prédiction et vérifier qu’ils figurent dans l’explication) et un test de reconstruction de l’entrée.",
+      "rqNote": "Test automatique directement réutilisable dans votre évaluation (RQ3)."
+    },
+    {
+      "id": "lanham",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Measuring Faithfulness in Chain-of-Thought Reasoning",
+      "short": "Lanham",
+      "authors": "T. Lanham et al.",
+      "year": "2023",
+      "venue": "arXiv",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Modifie le chain-of-thought (troncature, erreurs, paraphrase) pour voir si la réponse en dépend. La dépendance varie selon les tâches et diminue parfois avec la taille du modèle.",
+      "rqNote": "Méthode d’intervention pour vérifier si une explication influence vraiment la réponse (RQ3)."
+    },
+    {
+      "id": "madsen",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Are Self-Explanations from Large Language Models Faithful?",
+      "short": "Self-explanations",
+      "authors": "A. Madsen, S. Chandar, S. Reddy",
+      "year": "2024",
+      "venue": "Findings of ACL",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Évalue la fidélité de self-explanations (contrefactuelles, importance, masquage) par des tests d’auto-cohérence. Le résultat dépend fortement du modèle et de la tâche.",
+      "rqNote": "Confirme qu’il faut vérifier les explications du LLM au cas par cas (RQ3)."
+    },
+    {
+      "id": "n4",
+      "kind": "axis",
+      "domain": "nlp",
+      "label": "Raffinement itératif",
+      "short": "Raffinement itératif",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Boucles où un LLM critique et améliore sa propre sortie.",
+      "rqNote": "Mécanisme possible de vérification avant réponse (RQ3)."
+    },
+    {
+      "id": "selfrefine",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Self-Refine: Iterative Refinement with Self-Feedback",
+      "short": "Self-Refine",
+      "authors": "A. Madaan et al.",
+      "year": "2023",
+      "venue": "NeurIPS",
+      "status": "lu",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Un même LLM génère, critique puis raffine sa sortie en plusieurs itérations, sans entraînement. Gain d’environ 20 % sur sept tâches.",
+      "rqNote": "Mécanisme de raffinement réutilisable avant de répondre (RQ3)."
+    },
+    {
+      "id": "reflexion",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+      "short": "Reflexion",
+      "authors": "N. Shinn et al.",
+      "year": "2023",
+      "venue": "NeurIPS",
+      "status": "lu",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Agents qui transforment le retour de l’environnement en réflexion textuelle, gardée en mémoire pour les essais suivants (Actor, Evaluator, Self-Reflection).",
+      "rqNote": "La mémoire de réflexions ressemble à un modèle de l’utilisateur mis à jour au fil du dialogue (RQ1)."
+    },
+    {
+      "id": "crossrefine",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Cross-Refine: Improving Natural Language Explanation Generation by Learning in Tandem",
+      "short": "Cross-Refine",
+      "authors": "Q. Wang et al.",
+      "year": "2025",
+      "venue": "COLING",
+      "status": "en_cours",
+      "pioneer": false,
+      "verify": true,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Deux LLM en tandem : un générateur produit l’explication, un critique donne feedback et suggestions pour la raffiner.",
+      "rqNote": "Variante de vérification à deux modèles ; à comparer à SR-NLE (RQ3)."
+    },
+    {
+      "id": "srnle",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Self-Critique and Refinement for Faithful Natural Language Explanations",
+      "short": "SR-NLE",
+      "authors": "",
+      "year": "2025",
+      "venue": "",
+      "status": "lu",
+      "pioneer": false,
+      "verify": true,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "Feedback par mots importants (IWF) : unfaithfulness de 54,8 % à 36 %.",
+      "url": "",
+      "summary": "Le modèle critique et raffine sa propre explication post-hoc. Le feedback sur les mots importants (IWF, par attention ou Integrated Gradients) réduit l’infidélité d’environ 55 % à 36 %.",
+      "rqNote": "Montre comment injecter une attribution calculée pour rendre une NLE plus fidèle : modèle direct pour RQ3."
+    },
+    {
+      "id": "n5",
+      "kind": "axis",
+      "domain": "nlp",
+      "label": "LLM comme explainers d’autres modèles",
+      "short": "LLM comme explainers d’autres modèles",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Utiliser un LLM pour expliquer un autre modèle.",
+      "rqNote": "Faisabilité et limites d’un LLM placé entre le modèle et l’utilisateur (RQ2, RQ3)."
+    },
+    {
+      "id": "kroeger",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Are Large Language Models Post Hoc Explainers?",
+      "short": "LLM post-hoc",
+      "authors": "N. Kroeger et al.",
+      "year": "2023",
+      "venue": "arXiv",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ2",
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Évalue si un LLM peut identifier les variables importantes d’un autre modèle par apprentissage en contexte sur des exemples perturbés. Résultats comparables à certaines méthodes post-hoc sur données tabulaires.",
+      "rqNote": "Faisabilité d’un LLM explainer, mais fidélité à contrôler (RQ2, RQ3)."
+    },
+    {
+      "id": "zytek",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "LLMs for XAI: Future Directions for Explaining Explanations",
+      "short": "LLMs for XAI",
+      "authors": "A. Zytek et al.",
+      "year": "2024",
+      "venue": "arXiv",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": true,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Article de position sur l’usage des LLM pour transformer des explications de ML en récits lisibles : défis et directions.",
+      "rqNote": "Proche de XAIStories ; liste de défis utile pour l’étape « Communicate »."
+    },
+    {
+      "id": "n6",
+      "kind": "axis",
+      "domain": "nlp",
+      "label": "Dialogue, adaptation et Theory of Mind",
+      "short": "Dialogue, adaptation et Theory of Mind",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Contraindre et adapter des agents conversationnels ; capacité des LLM à modéliser l’autre.",
+      "rqNote": "Directement lié au modèle utilisateur (RQ1) et au contrôle du dialogue (RQ2)."
+    },
+    {
+      "id": "dfi",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Dialog Flow Induction for Constrainable LLM-Based Chatbots",
+      "short": "Dialog Flow Induction",
+      "authors": "",
+      "year": "2024",
+      "venue": "SIGDIAL",
+      "status": "lu",
+      "pioneer": false,
+      "verify": true,
+      "rq": [
+        "RQ2"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Génère automatiquement avec GPT-4 un flow de dialogue propre à un domaine (version intrinsèque et version guidée par des conversations réelles) pour contraindre un chatbot.",
+      "rqNote": "Un flow de dialogue explicatif pourrait encadrer les tours possibles du système (RQ2)."
+    },
+    {
+      "id": "coconstr",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Investigating Co-Constructive Behavior of Large Language Models in Explanation Dialogues",
+      "short": "LLM co-constructifs",
+      "authors": "",
+      "year": "2025",
+      "venue": "SIGDIAL",
+      "status": "lu",
+      "pioneer": false,
+      "verify": true,
+      "rq": [
+        "RQ1"
+      ],
+      "note": "Le prompting fait émerger monitoring et scaffolding, sans gain de compréhension objective.",
+      "url": "",
+      "summary": "Étude utilisateur avec Llama 3.1 70B : un prompt « co-constructif » augmente les questions de vérification et l’engagement, mais pas la compréhension objective.",
+      "rqNote": "Montre que le prompting seul ne suffit pas pour l’adaptation : argument pour un modèle utilisateur explicite (RQ1)."
+    },
+    {
+      "id": "kosinski",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Evaluating Large Language Models in Theory of Mind Tasks",
+      "short": "ToM des LLM",
+      "authors": "M. Kosinski",
+      "year": "2024",
+      "venue": "PNAS",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ1"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Soumet des LLM à des tâches classiques de fausse croyance ; les modèles récents en réussissent une large part.",
+      "rqNote": "Question ouverte : un LLM peut-il estimer seul les connaissances de l’utilisateur (RQ1) ?"
+    },
+    {
+      "id": "ullman",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Large Language Models Fail on Trivial Alterations to Theory-of-Mind Tasks",
+      "short": "Ullman",
+      "authors": "T. Ullman",
+      "year": "2023",
+      "venue": "arXiv",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ1"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Des modifications triviales des tâches de théorie de l’esprit font échouer les LLM.",
+      "rqNote": "Contre-argument : ne pas confier la modélisation de l’utilisateur au seul LLM (RQ1)."
+    },
+    {
+      "id": "n7",
+      "kind": "axis",
+      "domain": "nlp",
+      "label": "Évaluation de la génération",
+      "short": "Évaluation de la génération",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Évaluer automatiquement ou humainement des textes générés.",
+      "rqNote": "Choix des métriques pour la partie langage de l’évaluation."
+    },
+    {
+      "id": "novikova",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Why We Need New Evaluation Metrics for NLG",
+      "short": "Novikova",
+      "authors": "J. Novikova et al.",
+      "year": "2017",
+      "venue": "EMNLP",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Montre que les métriques automatiques de NLG (BLEU, ROUGE…) corrèlent mal avec les jugements humains.",
+      "rqNote": "Justifie une évaluation humaine ou par tâche, pas seulement par métriques de surface."
+    },
+    {
+      "id": "llmjudge",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena",
+      "short": "LLM-as-a-judge",
+      "authors": "L. Zheng et al.",
+      "year": "2023",
+      "venue": "NeurIPS Datasets & Benchmarks",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Étudie les LLM comme juges : bon accord avec les humains, mais biais de position, de verbosité et d’auto-préférence.",
+      "rqNote": "Option pour évaluer vos réponses à grande échelle, en contrôlant ces biais."
+    },
+    {
+      "id": "geval",
+      "kind": "paper",
+      "domain": "nlp",
+      "label": "G-Eval: NLG Evaluation using GPT-4 with Better Human Alignment",
+      "short": "G-Eval",
+      "authors": "Y. Liu et al.",
+      "year": "2023",
+      "venue": "EMNLP",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Évalue des textes générés avec GPT-4, chain-of-thought et formulaire de notation ; meilleure corrélation avec l’humain que les métriques classiques.",
+      "rqNote": "Autre option d’évaluation automatique de la qualité linguistique."
+    },
+    {
+      "id": "d1",
+      "kind": "axis",
+      "domain": "dlg",
+      "label": "Argumentation et dialogues : fondements",
+      "short": "Argumentation et dialogues : fondements",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Les bases : cadres d’argumentation abstraits et typologie des dialogues.",
+      "rqNote": "Vocabulaire commun avec votre collaborateur dialogues formels."
+    },
+    {
+      "id": "dung",
+      "kind": "paper",
+      "domain": "dlg",
+      "label": "On the Acceptability of Arguments and its Fundamental Role in Nonmonotonic Reasoning, Logic Programming and n-Person Games",
+      "short": "Dung",
+      "authors": "P. M. Dung",
+      "year": "1995",
+      "venue": "Artificial Intelligence",
+      "status": "a_lire",
+      "pioneer": true,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Définit les cadres d’argumentation abstraits (arguments et attaques) et les sémantiques d’acceptabilité.",
+      "rqNote": "Socle formel de tout le domaine 3."
+    },
+    {
+      "id": "walton",
+      "kind": "paper",
+      "domain": "dlg",
+      "label": "Commitment in Dialogue: Basic Concepts of Interpersonal Reasoning",
+      "short": "Walton & Krabbe",
+      "authors": "D. Walton, E. Krabbe",
+      "year": "1995",
+      "venue": "SUNY Press (livre)",
+      "status": "a_lire",
+      "pioneer": true,
+      "verify": false,
+      "rq": [
+        "RQ2"
+      ],
+      "note": "Typologie des dialogues, dont l’information-seeking.",
+      "url": "",
+      "summary": "Typologie des dialogues (persuasion, négociation, enquête, délibération, recherche d’information, éristique) et notion d’engagements.",
+      "rqNote": "Le dialogue explicatif se positionne dans cette typologie ; utile pour définir son protocole (RQ2)."
+    },
+    {
+      "id": "d2",
+      "kind": "axis",
+      "domain": "dlg",
+      "label": "Argumentation graduelle (QBAF)",
+      "short": "Argumentation graduelle (QBAF)",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Cadres d’argumentation quantitatifs bipolaires et sémantiques graduelles.",
+      "rqNote": "Outil formel candidat pour représenter et mettre à jour l’état de l’utilisateur (RQ1)."
+    },
+    {
+      "id": "baroni18",
+      "kind": "paper",
+      "domain": "dlg",
+      "label": "How Many Properties Do We Need for Gradual Argumentation?",
+      "short": "Propriétés graduelles",
+      "authors": "P. Baroni, A. Rago, F. Toni",
+      "year": "2018",
+      "venue": "AAAI",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ1"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Étudie les propriétés que doivent satisfaire les sémantiques graduelles qui calculent la force des arguments à partir des attaques et des supports.",
+      "rqNote": "Choisir une sémantique pour mettre à jour un score de l’utilisateur (RQ1)."
+    },
+    {
+      "id": "baroni19",
+      "kind": "paper",
+      "domain": "dlg",
+      "label": "From Fine-Grained Properties to Broad Principles for Gradual Argumentation: A Principled Spectrum",
+      "short": "Principes graduels",
+      "authors": "P. Baroni, A. Rago, F. Toni",
+      "year": "2019",
+      "venue": "International Journal of Approximate Reasoning",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ1"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Organise ces propriétés en principes généraux et en spectre de sémantiques graduelles pour les cadres bipolaires.",
+      "rqNote": "Référence de base pour les QBAF utilisés dans les travaux d’Umeå."
+    },
+    {
+      "id": "d3",
+      "kind": "axis",
+      "domain": "dlg",
+      "label": "Argumentation et XAI",
+      "short": "Argumentation et XAI",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Argumentation comme moyen de produire ou structurer des explications.",
+      "rqNote": "Pont direct entre dialogues formels et XAI (RQ2, RQ3)."
+    },
+    {
+      "id": "cyras",
+      "kind": "paper",
+      "domain": "dlg",
+      "label": "Argumentative XAI: A Survey",
+      "short": "Argumentative XAI",
+      "authors": "K. Čyras et al.",
+      "year": "2021",
+      "venue": "IJCAI",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ2",
+        "RQ3"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Survey de l’XAI argumentative : expliquer des modèles en les traduisant en argumentation, et utiliser des dialogues argumentatifs pour expliquer.",
+      "rqNote": "Pont direct entre XAI et dialogues formels ; montre des explications interactives et vérifiables (RQ2, RQ3)."
+    },
+    {
+      "id": "vassiliades",
+      "kind": "paper",
+      "domain": "dlg",
+      "label": "Argumentation and Explainable Artificial Intelligence: A Survey",
+      "short": "Argumentation & XAI",
+      "authors": "A. Vassiliades, N. Bassiliades, T. Patkos",
+      "year": "2021",
+      "venue": "Knowledge Engineering Review",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ2"
+      ],
+      "note": "",
+      "url": "",
+      "summary": "Survey de l’argumentation pour l’explicabilité, par domaine d’application.",
+      "rqNote": "Complète Čyras ; repérer des applications proches de la vôtre."
+    },
+    {
+      "id": "interrogating",
+      "kind": "paper",
+      "domain": "dlg",
+      "label": "Interrogating the Black Box: Transparency through Information-Seeking Dialogues",
+      "short": "Interrogating the Black Box",
+      "authors": "A. Brännström, J. C. Nieves",
+      "year": "2022",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": true,
+      "rq": [
+        "RQ1",
+        "RQ2"
+      ],
+      "note": "Pont direct entre dialogues formels et XAI. Lecture prioritaire.",
+      "url": "",
+      "summary": "D’après son titre et le groupe d’Umeå, propose d’utiliser des dialogues formels de recherche d’information pour interroger un système opaque et améliorer sa transparence. Résumé à confirmer à la lecture.",
+      "rqNote": "Probablement le lien le plus direct entre dialogues formels et votre système d’explication (RQ1, RQ2)."
+    },
+    {
+      "id": "d4",
+      "kind": "axis",
+      "domain": "dlg",
+      "label": "Modéliser l’interlocuteur",
+      "short": "Modéliser l’interlocuteur",
+      "authors": "",
+      "year": "",
+      "venue": "",
+      "status": "a_lire",
+      "pioneer": false,
+      "verify": false,
+      "rq": [],
+      "note": "",
+      "url": "",
+      "summary": "Représenter formellement les dispositions de l’interlocuteur pour choisir l’action suivante.",
+      "rqNote": "Modèle le plus proche de ce que demande RQ1, à transposer aux besoins explicatifs."
+    },
+    {
+      "id": "goalhiding",
+      "kind": "paper",
+      "domain": "dlg",
+      "label": "Goal-hiding Information-seeking Dialogues: A Formal Framework",
+      "short": "Goal-hiding dialogues",
+      "authors": "A. Brännström, V. Dignum, J. C. Nieves",
+      "year": "2024",
+      "venue": "International Journal of Approximate Reasoning, vol. 177",
+      "status": "lu",
+      "pioneer": false,
+      "verify": false,
+      "rq": [
+        "RQ1",
+        "RQ2"
+      ],
+      "note": "QBAF de willingness, graphe croyances-sujets, planification épistémique des sujets. Recommandé par le collaborateur dialogues formels.",
+      "url": "https://www.sciencedirect.com/science/article/pii/S0888613X24002123",
+      "summary": "Un agent seeker repousse son sujet cible jusqu’à ce que la disposition (willingness) de l’interlocuteur soit suffisante. La willingness est représentée par un QBAF mis à jour à partir des croyances exprimées, via un graphe croyances-sujets.",
+      "rqNote": "Transposition : remplacer la willingness par l’état de compréhension et les besoins de l’utilisateur, et le choix du sujet par le choix de l’intervention explicative (RQ1, RQ2)."
+    },
+    {
+      "id": "empathy",
+      "kind": "paper",
+      "domain": "dlg",
+      "label": "A Formal Understanding of Computational Empathy in Interactive Agents",
+      "short": "Empathie computationnelle",
+      "authors": "A. Brännström, J. Wester, J. C. Nieves",
+      "year": "2024",
+      "venue": "Cognitive Systems Research",
+      "status": "lu",
+      "pioneer": false,
+      "verify": true,
+      "rq": [
+        "RQ1"
+      ],
+      "note": "Perceive, Theory of Mind, Act : la représentation de l’interlocuteur doit guider l’action. Recommandé par le collaborateur dialogues formels.",
+      "url": "https://www.sciencedirect.com/science/article/pii/S1389041723001377",
+      "summary": "Définition formelle et multidimensionnelle de l’empathie computationnelle (percevoir, théorie de l’esprit, agir, manifester, ratification, interpersonnel), avec ontologie OWL et évaluation de Replika et Wysa.",
+      "rqNote": "Le principe « la représentation de l’autre doit guider l’action » est exactement le lien entre RQ1 et RQ2."
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "root",
+      "target": "xai",
+      "rel": "contient"
+    },
+    {
+      "id": "e2",
+      "source": "root",
+      "target": "nlp",
+      "rel": "contient"
+    },
+    {
+      "id": "e3",
+      "source": "root",
+      "target": "dlg",
+      "rel": "contient"
+    },
+    {
+      "id": "e4",
+      "source": "xai",
+      "target": "x1",
+      "rel": "contient"
+    },
+    {
+      "id": "e5",
+      "source": "x1",
+      "target": "lipton",
+      "rel": "contient"
+    },
+    {
+      "id": "e6",
+      "source": "x1",
+      "target": "doshi",
+      "rel": "contient"
+    },
+    {
+      "id": "e7",
+      "source": "x1",
+      "target": "miller",
+      "rel": "contient"
+    },
+    {
+      "id": "e8",
+      "source": "xai",
+      "target": "x2",
+      "rel": "contient"
+    },
+    {
+      "id": "e9",
+      "source": "x2",
+      "target": "lime",
+      "rel": "contient"
+    },
+    {
+      "id": "e10",
+      "source": "x2",
+      "target": "shap",
+      "rel": "contient"
+    },
+    {
+      "id": "e11",
+      "source": "x2",
+      "target": "ig",
+      "rel": "contient"
+    },
+    {
+      "id": "e12",
+      "source": "x2",
+      "target": "anchors",
+      "rel": "contient"
+    },
+    {
+      "id": "e13",
+      "source": "xai",
+      "target": "x3",
+      "rel": "contient"
+    },
+    {
+      "id": "e14",
+      "source": "x3",
+      "target": "wachter",
+      "rel": "contient"
+    },
+    {
+      "id": "e15",
+      "source": "x3",
+      "target": "dice",
+      "rel": "contient"
+    },
+    {
+      "id": "e16",
+      "source": "x3",
+      "target": "karimi",
+      "rel": "contient"
+    },
+    {
+      "id": "e17",
+      "source": "x3",
+      "target": "naturalxai",
+      "rel": "contient"
+    },
+    {
+      "id": "e18",
+      "source": "xai",
+      "target": "x4",
+      "rel": "contient"
+    },
+    {
+      "id": "e19",
+      "source": "x4",
+      "target": "tcav",
+      "rel": "contient"
+    },
+    {
+      "id": "e20",
+      "source": "xai",
+      "target": "x5",
+      "rel": "contient"
+    },
+    {
+      "id": "e21",
+      "source": "x5",
+      "target": "liao",
+      "rel": "contient"
+    },
+    {
+      "id": "e22",
+      "source": "x5",
+      "target": "kaur",
+      "rel": "contient"
+    },
+    {
+      "id": "e23",
+      "source": "x5",
+      "target": "alufaisan",
+      "rel": "contient"
+    },
+    {
+      "id": "e24",
+      "source": "x5",
+      "target": "bucinca",
+      "rel": "contient"
+    },
+    {
+      "id": "e25",
+      "source": "x5",
+      "target": "prefperf",
+      "rel": "contient"
+    },
+    {
+      "id": "e26",
+      "source": "xai",
+      "target": "x6",
+      "rel": "contient"
+    },
+    {
+      "id": "e27",
+      "source": "x6",
+      "target": "sokol",
+      "rel": "contient"
+    },
+    {
+      "id": "e28",
+      "source": "x6",
+      "target": "rohlfing",
+      "rel": "contient"
+    },
+    {
+      "id": "e29",
+      "source": "x6",
+      "target": "lakkaraju",
+      "rel": "contient"
+    },
+    {
+      "id": "e30",
+      "source": "x6",
+      "target": "ttm",
+      "rel": "contient"
+    },
+    {
+      "id": "e31",
+      "source": "x6",
+      "target": "interrolang",
+      "rel": "contient"
+    },
+    {
+      "id": "e32",
+      "source": "x6",
+      "target": "convxai",
+      "rel": "contient"
+    },
+    {
+      "id": "e33",
+      "source": "x6",
+      "target": "llmcheckup",
+      "rel": "contient"
+    },
+    {
+      "id": "e34",
+      "source": "x6",
+      "target": "xaistories",
+      "rel": "contient"
+    },
+    {
+      "id": "e35",
+      "source": "x6",
+      "target": "cocoxplain",
+      "rel": "contient"
+    },
+    {
+      "id": "e36",
+      "source": "xai",
+      "target": "x7",
+      "rel": "contient"
+    },
+    {
+      "id": "e37",
+      "source": "x7",
+      "target": "hoffman",
+      "rel": "contient"
+    },
+    {
+      "id": "e38",
+      "source": "x7",
+      "target": "jacovi",
+      "rel": "contient"
+    },
+    {
+      "id": "e39",
+      "source": "x7",
+      "target": "hase",
+      "rel": "contient"
+    },
+    {
+      "id": "e40",
+      "source": "x7",
+      "target": "nauta",
+      "rel": "contient"
+    },
+    {
+      "id": "e41",
+      "source": "nlp",
+      "target": "n1",
+      "rel": "contient"
+    },
+    {
+      "id": "e42",
+      "source": "n1",
+      "target": "transformer",
+      "rel": "contient"
+    },
+    {
+      "id": "e43",
+      "source": "n1",
+      "target": "t5",
+      "rel": "contient"
+    },
+    {
+      "id": "e44",
+      "source": "n1",
+      "target": "distill",
+      "rel": "contient"
+    },
+    {
+      "id": "e45",
+      "source": "nlp",
+      "target": "n2",
+      "rel": "contient"
+    },
+    {
+      "id": "e46",
+      "source": "n2",
+      "target": "esnli",
+      "rel": "contient"
+    },
+    {
+      "id": "e47",
+      "source": "n2",
+      "target": "cose",
+      "rel": "contient"
+    },
+    {
+      "id": "e48",
+      "source": "n2",
+      "target": "makeup",
+      "rel": "contient"
+    },
+    {
+      "id": "e49",
+      "source": "n2",
+      "target": "teachme",
+      "rel": "contient"
+    },
+    {
+      "id": "e50",
+      "source": "n2",
+      "target": "mariotti",
+      "rel": "contient"
+    },
+    {
+      "id": "e51",
+      "source": "n2",
+      "target": "cambria",
+      "rel": "contient"
+    },
+    {
+      "id": "e52",
+      "source": "n2",
+      "target": "mantle",
+      "rel": "contient"
+    },
+    {
+      "id": "e53",
+      "source": "n2",
+      "target": "situated",
+      "rel": "contient"
+    },
+    {
+      "id": "e54",
+      "source": "nlp",
+      "target": "n3",
+      "rel": "contient"
+    },
+    {
+      "id": "e55",
+      "source": "n3",
+      "target": "cot",
+      "rel": "contient"
+    },
+    {
+      "id": "e56",
+      "source": "n3",
+      "target": "turpin",
+      "rel": "contient"
+    },
+    {
+      "id": "e57",
+      "source": "n3",
+      "target": "atanasova",
+      "rel": "contient"
+    },
+    {
+      "id": "e58",
+      "source": "n3",
+      "target": "lanham",
+      "rel": "contient"
+    },
+    {
+      "id": "e59",
+      "source": "n3",
+      "target": "madsen",
+      "rel": "contient"
+    },
+    {
+      "id": "e60",
+      "source": "nlp",
+      "target": "n4",
+      "rel": "contient"
+    },
+    {
+      "id": "e61",
+      "source": "n4",
+      "target": "selfrefine",
+      "rel": "contient"
+    },
+    {
+      "id": "e62",
+      "source": "n4",
+      "target": "reflexion",
+      "rel": "contient"
+    },
+    {
+      "id": "e63",
+      "source": "n4",
+      "target": "crossrefine",
+      "rel": "contient"
+    },
+    {
+      "id": "e64",
+      "source": "n4",
+      "target": "srnle",
+      "rel": "contient"
+    },
+    {
+      "id": "e65",
+      "source": "nlp",
+      "target": "n5",
+      "rel": "contient"
+    },
+    {
+      "id": "e66",
+      "source": "n5",
+      "target": "kroeger",
+      "rel": "contient"
+    },
+    {
+      "id": "e67",
+      "source": "n5",
+      "target": "zytek",
+      "rel": "contient"
+    },
+    {
+      "id": "e68",
+      "source": "nlp",
+      "target": "n6",
+      "rel": "contient"
+    },
+    {
+      "id": "e69",
+      "source": "n6",
+      "target": "dfi",
+      "rel": "contient"
+    },
+    {
+      "id": "e70",
+      "source": "n6",
+      "target": "coconstr",
+      "rel": "contient"
+    },
+    {
+      "id": "e71",
+      "source": "n6",
+      "target": "kosinski",
+      "rel": "contient"
+    },
+    {
+      "id": "e72",
+      "source": "n6",
+      "target": "ullman",
+      "rel": "contient"
+    },
+    {
+      "id": "e73",
+      "source": "nlp",
+      "target": "n7",
+      "rel": "contient"
+    },
+    {
+      "id": "e74",
+      "source": "n7",
+      "target": "novikova",
+      "rel": "contient"
+    },
+    {
+      "id": "e75",
+      "source": "n7",
+      "target": "llmjudge",
+      "rel": "contient"
+    },
+    {
+      "id": "e76",
+      "source": "n7",
+      "target": "geval",
+      "rel": "contient"
+    },
+    {
+      "id": "e77",
+      "source": "dlg",
+      "target": "d1",
+      "rel": "contient"
+    },
+    {
+      "id": "e78",
+      "source": "d1",
+      "target": "dung",
+      "rel": "contient"
+    },
+    {
+      "id": "e79",
+      "source": "d1",
+      "target": "walton",
+      "rel": "contient"
+    },
+    {
+      "id": "e80",
+      "source": "dlg",
+      "target": "d2",
+      "rel": "contient"
+    },
+    {
+      "id": "e81",
+      "source": "d2",
+      "target": "baroni18",
+      "rel": "contient"
+    },
+    {
+      "id": "e82",
+      "source": "d2",
+      "target": "baroni19",
+      "rel": "contient"
+    },
+    {
+      "id": "e83",
+      "source": "dlg",
+      "target": "d3",
+      "rel": "contient"
+    },
+    {
+      "id": "e84",
+      "source": "d3",
+      "target": "cyras",
+      "rel": "contient"
+    },
+    {
+      "id": "e85",
+      "source": "d3",
+      "target": "vassiliades",
+      "rel": "contient"
+    },
+    {
+      "id": "e86",
+      "source": "d3",
+      "target": "interrogating",
+      "rel": "contient"
+    },
+    {
+      "id": "e87",
+      "source": "dlg",
+      "target": "d4",
+      "rel": "contient"
+    },
+    {
+      "id": "e88",
+      "source": "d4",
+      "target": "goalhiding",
+      "rel": "contient"
+    },
+    {
+      "id": "e89",
+      "source": "d4",
+      "target": "empathy",
+      "rel": "contient"
+    },
+    {
+      "id": "e90",
+      "source": "srnle",
+      "target": "ig",
+      "rel": "utilise"
+    },
+    {
+      "id": "e91",
+      "source": "srnle",
+      "target": "atanasova",
+      "rel": "utilise"
+    },
+    {
+      "id": "e92",
+      "source": "srnle",
+      "target": "selfrefine",
+      "rel": "etend"
+    },
+    {
+      "id": "e93",
+      "source": "crossrefine",
+      "target": "selfrefine",
+      "rel": "proche"
+    },
+    {
+      "id": "e94",
+      "source": "reflexion",
+      "target": "selfrefine",
+      "rel": "proche"
+    },
+    {
+      "id": "e95",
+      "source": "xaistories",
+      "target": "shap",
+      "rel": "utilise"
+    },
+    {
+      "id": "e96",
+      "source": "xaistories",
+      "target": "dice",
+      "rel": "utilise"
+    },
+    {
+      "id": "e97",
+      "source": "zytek",
+      "target": "xaistories",
+      "rel": "proche"
+    },
+    {
+      "id": "e98",
+      "source": "ttm",
+      "target": "shap",
+      "rel": "utilise"
+    },
+    {
+      "id": "e99",
+      "source": "ttm",
+      "target": "lime",
+      "rel": "utilise"
+    },
+    {
+      "id": "e100",
+      "source": "llmcheckup",
+      "target": "ttm",
+      "rel": "etend"
+    },
+    {
+      "id": "e101",
+      "source": "interrolang",
+      "target": "ttm",
+      "rel": "etend"
+    },
+    {
+      "id": "e102",
+      "source": "convxai",
+      "target": "ttm",
+      "rel": "proche"
+    },
+    {
+      "id": "e103",
+      "source": "cocoxplain",
+      "target": "rohlfing",
+      "rel": "inspire"
+    },
+    {
+      "id": "e104",
+      "source": "coconstr",
+      "target": "rohlfing",
+      "rel": "inspire"
+    },
+    {
+      "id": "e105",
+      "source": "mantle",
+      "target": "lime",
+      "rel": "compare"
+    },
+    {
+      "id": "e106",
+      "source": "mantle",
+      "target": "anchors",
+      "rel": "compare"
+    },
+    {
+      "id": "e107",
+      "source": "mantle",
+      "target": "t5",
+      "rel": "utilise"
+    },
+    {
+      "id": "e108",
+      "source": "mantle",
+      "target": "hase",
+      "rel": "utilise"
+    },
+    {
+      "id": "e109",
+      "source": "naturalxai",
+      "target": "wachter",
+      "rel": "etend"
+    },
+    {
+      "id": "e110",
+      "source": "naturalxai",
+      "target": "karimi",
+      "rel": "proche"
+    },
+    {
+      "id": "e111",
+      "source": "dice",
+      "target": "wachter",
+      "rel": "etend"
+    },
+    {
+      "id": "e112",
+      "source": "goalhiding",
+      "target": "baroni19",
+      "rel": "utilise"
+    },
+    {
+      "id": "e113",
+      "source": "goalhiding",
+      "target": "walton",
+      "rel": "inspire"
+    },
+    {
+      "id": "e114",
+      "source": "cyras",
+      "target": "dung",
+      "rel": "inspire"
+    },
+    {
+      "id": "e115",
+      "source": "baroni19",
+      "target": "dung",
+      "rel": "etend"
+    },
+    {
+      "id": "e116",
+      "source": "interrogating",
+      "target": "walton",
+      "rel": "inspire"
+    },
+    {
+      "id": "e117",
+      "source": "interrogating",
+      "target": "lakkaraju",
+      "rel": "proche"
+    },
+    {
+      "id": "e118",
+      "source": "lakkaraju",
+      "target": "sokol",
+      "rel": "proche"
+    },
+    {
+      "id": "e119",
+      "source": "prefperf",
+      "target": "bucinca",
+      "rel": "proche"
+    },
+    {
+      "id": "e120",
+      "source": "makeup",
+      "target": "esnli",
+      "rel": "critique"
+    },
+    {
+      "id": "e121",
+      "source": "turpin",
+      "target": "cot",
+      "rel": "critique"
+    },
+    {
+      "id": "e122",
+      "source": "lanham",
+      "target": "cot",
+      "rel": "critique"
+    },
+    {
+      "id": "e123",
+      "source": "situated",
+      "target": "miller",
+      "rel": "inspire"
+    },
+    {
+      "id": "e124",
+      "source": "kroeger",
+      "target": "lime",
+      "rel": "compare"
+    },
+    {
+      "id": "e125",
+      "source": "ullman",
+      "target": "kosinski",
+      "rel": "critique"
+    },
+    {
+      "id": "e126",
+      "source": "goalhiding",
+      "target": "empathy",
+      "rel": "proche"
+    },
+    {
+      "id": "e127",
+      "source": "cocoxplain",
+      "target": "ttm",
+      "rel": "compare"
+    },
+    {
+      "id": "e128",
+      "source": "liao",
+      "target": "miller",
+      "rel": "inspire"
+    },
+    {
+      "id": "e129",
+      "source": "jacovi",
+      "target": "esnli",
+      "rel": "critique"
+    }
+  ]
+}
